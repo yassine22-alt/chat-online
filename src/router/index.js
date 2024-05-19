@@ -27,12 +27,12 @@ const routes = [
     },
     {
         path: '/main/:id',
-        name:  main,
+        name:  'main',
         component :mainPage
     },
     {
         path: '/newusers/:id',
-        name:  newUsers,
+        name:  'newUsers',
         component :newUsers
     },
     {
@@ -51,3 +51,10 @@ const routes = [
         component : newChatroomView
     }
 ]
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes
+})
+
+export default router
