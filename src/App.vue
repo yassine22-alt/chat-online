@@ -5,11 +5,11 @@
 </template>
 
 <script>
-import loginView from './view/loginView.vue'
+import loginView from './view/loginView.vue';
 export default {
   name: 'App',
   components: {
-    loginView
+    loginView,
   }
 }
 </script>

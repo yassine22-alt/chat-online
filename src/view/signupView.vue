@@ -10,8 +10,11 @@
   
   <script>
   import { register } from '@/auth/auth.js';
-  import { auth } from '@/firebase/config.js'  
-  
+  import { auth, db } from '@/firebase/config.js';
+  import { collection, addDoc } from 'firebase/firestore';
+
+
+
   export default {
     data() {
       return {
@@ -23,7 +26,15 @@
       async handleRegister() {
         try {
           await register(this.email, this.password);
-          this.$router.push('/');
+          const docRef = await addDoc(collection(db, "users"), {
+            name:this.email,
+            email:this.email,
+            photo:null,
+            bio:null,
+            birth_date:null,
+            state: true
+          });
+          this.$router.push({ name: 'main', params: { id: docRef.id } });
         } catch (error) {
           console.error('Registration error:', error);
         }
