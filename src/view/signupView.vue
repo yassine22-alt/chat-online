@@ -7,7 +7,9 @@
             <div class="card-body p-5 text-center">
               <h3 class="mb-5 fw-bold">Sign Up</h3>
               <div data-mdb-input-init class="form-outline mb-4">
-                <label class="form-label fw-bold" for="typeEmailX-2">Email</label>
+                <label class="form-label fw-bold" for="typeEmailX-2"
+                  >Email</label
+                >
                 <input
                   v-model="email"
                   type="email"
@@ -17,7 +19,9 @@
                 />
               </div>
               <div data-mdb-input-init class="form-outline mb-4">
-                <label class="form-label fw-bold" for="typePasswordX-2">Password</label>
+                <label class="form-label fw-bold" for="typePasswordX-2"
+                  >Password</label
+                >
                 <input
                   v-model="password"
                   type="password"
@@ -55,23 +59,44 @@
 </template>
 
 <script>
-import { register } from "@/auth/auth.js";
-import { auth } from "@/firebase/config.js";
+  import { register } from '@/auth/auth.js';
+  import { auth, db } from '@/firebase/config.js';
+  import { collection, addDoc } from 'firebase/firestore';
 
-export default {
-  data() {
-    return {
-      email: "",
-      password: "",
-    };
-  },
-  methods: {
-    async handleRegister() {
-      try {
-        await register(this.email, this.password);
-        this.$router.push("/");
-      } catch (error) {
-        console.error("Registration error:", error);
+
+
+  export default {
+    data() {
+      return {
+        email: '',
+        password: ''
+      };
+    },
+    methods: {
+      async handleRegister() {
+        try {
+          await register(this.email, this.password);
+          const docRef = await addDoc(collection(db, "users"), {
+            name:this.email,
+            email:this.email,
+            photo:null,
+            bio:null,
+            birth_date:null,
+            state: true
+          });
+          this.$router.push({ name: 'main', params: { id: docRef.id } });
+        } catch (error) {
+          console.error('Registration error:', error);
+        }
+      },
+      async googleSignIn() {
+        const provider = new auth.GoogleAuthProvider();
+        try {
+          await auth.signInWithPopup(provider);
+          this.$router.push('/');
+        } catch (error) {
+          console.error('Google sign-in error:', error);
+        }
       }
     },
     async googleSignIn() {
@@ -83,6 +108,5 @@ export default {
         console.error("Google sign-in error:", error);
       }
     },
-  },
 };
 </script>
