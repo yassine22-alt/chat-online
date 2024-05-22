@@ -64,7 +64,7 @@
 <script>
   import { register } from '@/auth/auth.js';
   import { auth, db } from '@/firebase/config.js';
-  import { collection, addDoc } from 'firebase/firestore';
+  import { doc, setDoc } from 'firebase/firestore';
 
   export default {
     data() {
@@ -76,8 +76,8 @@
     methods: {
       async handleRegister() {
         try {
-          await register(this.email, this.password);
-          const docRef = await addDoc(collection(db, "users"), {
+          const user = await register(this.email, this.password);
+          setDoc(doc(db, "users", user.uid), {
             name:this.email,
             email:this.email,
             photo:null,
@@ -85,7 +85,7 @@
             birth_date:null,
             state: true
           });
-          this.$router.push({ name: 'main', params: { id: docRef.id } });
+          this.$router.push({ name: 'main', params: { id: user.uid } });
         } catch (error) {
           console.error('Registration error:', error);
         }
