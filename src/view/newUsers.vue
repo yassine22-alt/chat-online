@@ -1,6 +1,6 @@
 <template>
-  <div>
     <div>
+  <div>
       <nav class="navbar fixed-top navbar-light bg-light">
         <div class="container-fluid">
           <a class="navbar-brand">
@@ -51,20 +51,22 @@
           </div>
         </div>
       </nav>
+ 
+      <div class="myusers">
+      <UserDetails
+        v-for="user in filteredUsers"
+        :key="user.id"
+        :user="user"
+        @click.native="createChat(user.id)"
+      />
     </div>
-    <div class="myusers">
-        <UserDetails
-      v-for="user in filteredUsers"
-      :key="user.id"
-      :user="user"
-    ></UserDetails>
     </div>
     
-  </div>
+</div>
 </template>
 <script>
 import { db } from "@/firebase/config.js";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 import UserDetails from "@/components/userDetails.vue";
 
 export default {
@@ -94,6 +96,21 @@ export default {
         console.error("Error fetching users:", error);
       }
     },
+    async createChat(otherUserId) {
+      try {
+        const chatData = {
+          chat_name:"hh",
+          involved_users:[this.userId, otherUserId],
+          messages:[],
+          typing_status:[]
+        };
+        const chat = await addDoc(collection(db, "chatrooms"), chatData);
+        console.log("Chat created successfully");
+        this.$router.push(`/chat/${this.userId}/${chat.id}`)
+      } catch (error) {
+        console.error("Failed to create chat:", error);
+      }
+    },
     goto_newusers() {
       this.$router.push(`/newusers/${this.userId}`);
     },
@@ -102,7 +119,7 @@ export default {
     },
     backto_mainpage() {
       this.$router.push(`/main/${this.userId}`);
-    },
+    }
   },
 
   computed: {

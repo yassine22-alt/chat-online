@@ -1,6 +1,6 @@
 <template>
     <div class="user-details mt-1">
-      <img :src="user.photo" :alt="user.name" class="profile-photo"/>
+      <img :src=user.photo class="profile-photo"/>
       <div class="user-name">{{ user.name }}</div>
     </div>
   </template>
