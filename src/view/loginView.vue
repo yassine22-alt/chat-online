@@ -57,8 +57,6 @@
 
 <script>
 import { login } from "@/auth/auth.js";
-import { db } from "@/firebase/config";
-import { query, collection, where, getDocs } from "firebase/firestore";
 
 export default {
   data() {
@@ -73,20 +71,8 @@ export default {
         const user = await login(this.email, this.password);
         console.log("Logged in user:", user);
 
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("email", "==", this.email));
-        const querySnapshot = await getDocs(q);
-
-        let docId = null;
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            docId = doc.id;
-          });
-          this.$router.push({ name: "main", params: { id: docId } });
-        } else {
-          console.error("No user found with this email:", this.email);
-          alert("No user found with this email.");
-        }
+          this.$router.push({ name: "main", params: { id: user.uid } });
+        
       } catch (error) {
         console.error("Login error:", error);
       }
