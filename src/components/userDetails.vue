@@ -1,5 +1,5 @@
 <template>
-    <div class="user-details">
+    <div class="user-details mt-1">
       <img :src="user.photo" :alt="user.name" class="profile-photo"/>
       <div class="user-name">{{ user.name }}</div>
     </div>
