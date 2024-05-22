@@ -1,13 +1,23 @@
 <template>
-  <section class="vh-100" style="background-color: #808080">
+  <section class="whole vh-100" style="background-color: #808080">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
           <div class="card shadow-2-strong" style="border-radius: 1rem">
             <div class="card-body p-5 text-center">
+              <a href="/" class="d-flex justify-content-center mb-4">
+                <img
+                  src="@/assets/MyChatBox_transparent.png"
+                  alt="MyChatBox Logo"
+                  width="200"
+                  class="d-inline-block align-top"
+                />
+              </a>
               <h3 class="mb-5 fw-bold">Login</h3>
               <div data-mdb-input-init class="form-outline mb-4">
-                <label class="form-label fw-bold" for="typeEmailX-2">Email</label>
+                <label class="form-label fw-bold" for="typeEmailX-2"
+                  >Email</label
+                >
                 <input
                   v-model="email"
                   type="email"
@@ -17,7 +27,9 @@
                 />
               </div>
               <div data-mdb-input-init class="form-outline mb-4">
-                <label class="form-label fw-bold" for="typePasswordX-2">Password</label>
+                <label class="form-label fw-bold" for="typePasswordX-2"
+                  >Password</label
+                >
                 <input
                   v-model="password"
                   type="password"
@@ -42,45 +54,51 @@
     </div>
   </section>
 </template>
-  
-  <script>
-    import { login } from '@/auth/auth.js';
-    import { db } from '@/firebase/config';
-    import { query, collection, where, getDocs } from 'firebase/firestore';
 
-  export default {
-    data() {
-      return {
-        email: '',
-        password: ''
-      };
-    },
-    methods: {
-      async handleLogin() {
-        try {
-            const user = await login(this.email, this.password);
-            console.log('Logged in user:', user);
+<script>
+import { login } from "@/auth/auth.js";
+import { db } from "@/firebase/config";
+import { query, collection, where, getDocs } from "firebase/firestore";
 
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, where("email", "==", this.email));
-            const querySnapshot = await getDocs(q);
+export default {
+  data() {
+    return {
+      email: "",
+      password: "",
+    };
+  },
+  methods: {
+    async handleLogin() {
+      try {
+        const user = await login(this.email, this.password);
+        console.log("Logged in user:", user);
 
-            let docId = null;
-            if (!querySnapshot.empty) {
-                querySnapshot.forEach((doc) => {
-                docId = doc.id;  
-        });
-          this.$router.push({ name: 'main', params: { id: docId } });
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("email", "==", this.email));
+        const querySnapshot = await getDocs(q);
+
+        let docId = null;
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            docId = doc.id;
+          });
+          this.$router.push({ name: "main", params: { id: docId } });
         } else {
-           console.error('No user found with this email:', this.email);
-           alert('No user found with this email.');
+          console.error("No user found with this email:", this.email);
+          alert("No user found with this email.");
         }
-
-        } catch (error) {
-          console.error('Login error:', error);
-        }
+      } catch (error) {
+        console.error("Login error:", error);
       }
-    }
-  }
-  </script>
-  
+    },
+  },
+};
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
+
+.whole{
+  font-family: "Reddit Mono", monospace;
+}
+</style>

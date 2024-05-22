@@ -7,7 +7,7 @@
           </a>
           <div class="d-flex ms-auto">
             <router-link to="/signup" class="btn btn-outline-dark me-2">Sign Up</router-link>
-            <router-link to="/login" class="btn btn-outline-dark">Log In</router-link>
+            <router-link to="/login" class="btn btn-outline-dark">Login</router-link>
           </div>
         </div>
       </nav>
@@ -25,7 +25,7 @@
   export default {
     data() {
       return {
-        welcomeMessage: "An app where you can chat with friends and family",
+        welcomeMessage: "An app where you can chat with friends and family!",
         typingSpeed: 100, 
       };
     },
@@ -51,14 +51,17 @@
   </script>
   
   <style>
+  @import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
+
   .home {
+    font-family: "Reddit Mono", monospace;
     min-height: 100vh;
     position: relative;
   }
   
   .welcome-message {
     text-align: center;
-    padding-top: 250px;
+    padding-top: 200px;
   }
   
   .welcome-message h1 {

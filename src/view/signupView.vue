@@ -1,10 +1,13 @@
 <template>
-  <section class="vh-100" style="background-color: #808080">
+  <section class="whole vh-100" style="background-color: #808080">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
           <div class="card shadow-2-strong" style="border-radius: 1rem">
             <div class="card-body p-5 text-center">
+              <a href="/" class="d-flex justify-content-center mb-4">
+                <img src="@/assets/MyChatBox_transparent.png" alt="MyChatBox Logo" width="200" class="d-inline-block align-top">
+            </a>
               <h3 class="mb-5 fw-bold">Sign Up</h3>
               <div data-mdb-input-init class="form-outline mb-4">
                 <label class="form-label fw-bold" for="typeEmailX-2"
@@ -63,8 +66,6 @@
   import { auth, db } from '@/firebase/config.js';
   import { collection, addDoc } from 'firebase/firestore';
 
-
-
   export default {
     data() {
       return {
@@ -110,3 +111,10 @@
     },
 };
 </script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
+.whole{
+  font-family: "Reddit Mono", monospace;
+}
+</style>
