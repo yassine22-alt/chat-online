@@ -71,45 +71,49 @@
                     class="img-fluid my-5"
                     style="width: 80px"
                   />
-                  <div v-if=currentUser>
+                  <div v-if="currentUser">
                     <h5>{{ currentUser.name }}</h5>
-                  <p>{{ currentUser.email }}</p></div>
-                  
-                  <i class="far fa-edit mb-5"></i>
+                    <p>{{ currentUser.email }}</p>
+                  </div>
                 </div>
                 <div class="col-md-8">
                   <div class="card-body p-4">
-                    <h6>Information</h6>
+                    <h6>Bio</h6>
                     <hr class="mt-0 mb-4" />
-                    <div class="row pt-1">
-                      <div class="col-6 mb-3">
-                        <h6>Email</h6>
-                        <p class="text-muted">info@example.com</p>
-                      </div>
-                      <div class="col-6 mb-3">
-                        <h6>Phone</h6>
-                        <p class="text-muted">123 456 789</p>
-                      </div>
+                    <div v-if="currentUser && currentUser.bio">
+                      <p>{{ currentUser.bio }}</p>
                     </div>
-                    <h6>Projects</h6>
+                    <div v-else>
+                      <p>Press edit to enter your bio</p>
+                    </div>
+                    <h6>Birthdate</h6>
                     <hr class="mt-0 mb-4" />
-                    <div class="row pt-1">
-                      <div class="col-6 mb-3">
-                        <h6>Recent</h6>
-                        <p class="text-muted">Lorem ipsum</p>
-                      </div>
-                      <div class="col-6 mb-3">
-                        <h6>Most Viewed</h6>
-                        <p class="text-muted">Dolor sit amet</p>
-                      </div>
+                    <div v-if="currentUser && currentUser.birthdate">
+                      <p>{{ currentUser.birthdate }}</p>
                     </div>
-                    <div class="d-flex justify-content-start">
-                      <a href="#!"
-                        ><i class="fab fa-facebook-f fa-lg me-3"></i
-                      ></a>
-                      <a href="#!"><i class="fab fa-twitter fa-lg me-3"></i></a>
-                      <a href="#!"><i class="fab fa-instagram fa-lg"></i></a>
+                    <div v-else>
+                      <p>Press edit to enter your birthdate</p>
                     </div>
+                  </div>
+                  <div class="card-footer d-flex justify-content-end">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-pencil-square"
+                      viewBox="0 0 16 16"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editProfile"
+                    >
+                      <path
+                        d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"
+                      />
+                      <path
+                        fill-rule="evenodd"
+                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+                      />
+                    </svg>
                   </div>
                 </div>
               </div>
@@ -118,6 +122,40 @@
         </div>
       </div>
     </section>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="editProfile"
+      tabindex="-1"
+      aria-labelledby="editProfile"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editProfile">Modal title</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">...</div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -164,4 +202,3 @@ export default {
   },
 };
 </script>
-
