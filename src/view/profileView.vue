@@ -51,11 +51,11 @@
       </div>
     </nav>
 
-    <section class="vh-100 " style="background-color: lightgrey" >
+    <section class="vh-100" style="background-color: lightgrey">
       <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
           <div class="col col-lg-6 mb-4 mb-lg-0">
-            <div class="card mb-3" style="border-radius: 0.5rem ">
+            <div class="card mb-3" style="border-radius: 0.5rem">
               <div class="row g-0">
                 <div
                   class="col-md-4 gradient-custom text-center text-white"
@@ -71,11 +71,13 @@
                     class="img-fluid my-5"
                     style="width: 80px"
                   />
-                  <h5>Marie Horwitz</h5>
-                  <p>Web Designer</p>
+                  <div v-if=currentUser>
+                    <h5>{{ currentUser.name }}</h5>
+                  <p>{{ currentUser.email }}</p></div>
+                  
                   <i class="far fa-edit mb-5"></i>
                 </div>
-                <div class="col-md-8">                      
+                <div class="col-md-8">
                   <div class="card-body p-4">
                     <h6>Information</h6>
                     <hr class="mt-0 mb-4" />
@@ -119,26 +121,46 @@
   </div>
 </template>
 <script>
+import { db } from "@/firebase/config.js";
+import { collection, getDocs } from "firebase/firestore";
+
 export default {
   data() {
     return {
-      userId: null,
+      users: [],
+      userId: this.$route.params.id,
+      currentUser: null,
     };
   },
 
   methods: {
+    async fetchUsersAndCurrentUser() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        querySnapshot.forEach((doc) => {
+          let user = doc.data();
+          user.id = doc.id;
+          this.users.push(user);
+          if (user.id === this.userId) {
+            this.currentUser = user;
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    },
     goto_newusers() {
-      const userId = this.$route.params.id;
-      this.$router.push(`/newusers/${userId}`);
+      this.$router.push(`/newusers/${this.userId}`);
     },
     goto_profile() {
-      const userId = this.$route.params.id;
-      this.$router.push(`/profile/${userId}`);
+      this.$router.push(`/profile/${this.userId}`);
     },
     backto_mainpage() {
-      const userId = this.$route.params.id;
-      this.$router.push(`/main/${userId}`);
+      this.$router.push(`/main/${this.userId}`);
     },
+  },
+  created() {
+    this.fetchUsersAndCurrentUser();
   },
 };
 </script>
