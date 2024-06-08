@@ -1,57 +1,68 @@
 <template>
   <div>
     <Navbar />
-    <nav class="navbar navbar-light searchbar">
-      <div class="container-fluid">
-        <form class="d-flex mx-auto" style="width: 100%; max-width: 600px">
-          <input
-            class="form-control me-2 flex-grow-1"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-          />
-          <button class="btn btn-outline-dark" type="submit">Search</button>
-        </form>
-      </div>
-    </nav>
+    <div class="chats">
+      <ChatDetails
+        v-for="chatId in userConversations"
+        :key="chatId"
+        :chatId="chatId"
+        :userId="userId"
+        @open-chat="openChat"
+      />
+    </div>
   </div>
 </template>
 
 <script>
+import { db } from "@/firebase/config.js";
+import { doc, getDoc } from "firebase/firestore";
+import ChatDetails from "@/components/chatDetails.vue";
 import Navbar from "@/components/NavBar.vue";
+
 export default {
   components: {
+    ChatDetails,
     Navbar,
   },
   data() {
     return {
       userId: null,
+      userConversations: [],
     };
   },
-
+  async mounted() {
+    this.userId = this.$route.params.id;
+    await this.fetchUserConversations();
+  },
   methods: {
+    async fetchUserConversations() {
+      try {
+        const userDoc = await getDoc(doc(db, "users", this.userId));
+        if (userDoc.exists()) {
+          this.userConversations = userDoc.data().conversations || [];
+        }
+      } catch (error) {
+        console.error("Error fetching user conversations:", error);
+      }
+    },
+    openChat(chatId) {
+      this.$router.push(`/chat/${this.userId}/${chatId}`);
+    },
     goto_newusers() {
-      const userId = this.$route.params.id;
-      this.$router.push(`/newusers/${userId}`);
+      this.$router.push(`/newusers/${this.userId}`);
     },
     goto_profile() {
-      const userId = this.$route.params.id;
-      this.$router.push(`/profile/${userId}`);
+      this.$router.push(`/profile/${this.userId}`);
     },
     backto_mainpage() {
-      const userId = this.$route.params.id;
-      this.$router.push(`/main/${userId}`);
+      this.$router.push(`/main/${this.userId}`);
     },
   },
 };
 </script>
-<style>
-.searchbar {
-  margin-top: 90px;
-  justify-content: center;
-}
 
-.popover-icon {
-  cursor: pointer;
+<style>
+.chats {
+  margin-top: 90px;
 }
 </style>
