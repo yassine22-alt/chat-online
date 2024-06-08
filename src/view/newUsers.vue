@@ -98,11 +98,12 @@ export default {
   },
 
   computed: {
-  filteredUsers() {
-    return this.users.filter((user) => {
-      return !this.userConversations.includes(user.id);
-    });
-  },
+    filteredUsers() {
+      return this.users.filter((user) => {
+        return user.id !== this.userId && !this.userConversations.includes(user.id);
+  });
+},
+
 }
 };
 </script>
