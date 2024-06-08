@@ -46,7 +46,7 @@ const routes = [
         component:chatRoomView
     },
     {
-        path: '/newchat/',
+        path: '/newchat/:id',
         name:  'newchat',
         component : newChatroomView
     }
