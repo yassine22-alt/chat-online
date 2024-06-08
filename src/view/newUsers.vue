@@ -51,10 +51,37 @@ export default {
     async fetchUsers() {
       try {
         const querySnapshot = await getDocs(collection(db, "users"));
+        const involvedUsers = this.userConversations.reduce((acc, convoId) => {
+          const convoRef = doc(db, "chatrooms", convoId);
+          acc.push(convoRef);
+          return acc;
+        }, []);
+
+        const involvedUsersData = await Promise.all(
+          involvedUsers.map(async (userRef) => {
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              return userSnap.data().involved_users;
+            }
+            return null;
+          })
+        );
+
+        const excludedUserIds = involvedUsersData.reduce((acc, users) => {
+          if (users) {
+            users.forEach((userId) => {
+              if (userId !== this.userId && !acc.includes(userId)) {
+                acc.push(userId);
+              }
+            });
+          }
+          return acc;
+        }, []);
+
         querySnapshot.forEach((doc) => {
           let user = doc.data();
           user.id = doc.id;
-          if (!this.userConversations.includes(user.id)) {
+          if (!excludedUserIds.includes(user.id) && user.id !== this.userId) {
             this.users.push(user);
           }
         });
@@ -67,11 +94,10 @@ export default {
         const chatData = {
           chat_name: "Chat",
           involved_users: [this.userId, otherUserId],
-          messages: [],
+          message: [],
           typing_status: []
         };
         const chat = await addDoc(collection(db, "chatrooms"), chatData);
-
         await updateDoc(doc(db, "users", this.userId), {
           conversations: arrayUnion(chat.id)
         });
@@ -101,10 +127,9 @@ export default {
     filteredUsers() {
       return this.users.filter((user) => {
         return user.id !== this.userId && !this.userConversations.includes(user.id);
-  });
-},
-
-}
+      });
+    },
+  },
 };
 </script>
 
