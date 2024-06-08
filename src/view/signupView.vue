@@ -12,15 +12,25 @@
       </div>
     </nav>
 
-    <section class="whole vh-100" style="background-color: #808080">
-      <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-          <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div class="card shadow-2-strong" style="border-radius: 1rem; width: 100%;">
+    <section class="whole" style="background-color: #808080">
+      <div class="container py-5">
+        <div class="d-flex justify-content-center align-items-center">
+          <div class="">
+            <div class="card shadow-2-strong p-3" style="border-radius: 1rem; width: 100%;">
               <div class="card-body p-5 text-center">
-               
                 <h3 class="mb-5 fw-bold">Sign Up</h3>
                 <form @submit.prevent="handleRegister">
+                  <div data-mdb-input-init class="form-outline mb-4">
+                    <label class="form-label fw-bold" for="typeNameX">Name</label>
+                    <input
+                      v-model="name"
+                      type="text"
+                      id="typeNameX"
+                      class="form-control form-control-lg"
+                      placeholder="Name"
+                      required
+                    />
+                  </div>
                   <div data-mdb-input-init class="form-outline mb-4">
                     <label class="form-label fw-bold" for="typeEmailX-2">Email</label>
                     <input
@@ -44,13 +54,13 @@
                     />
                   </div>
                   <div data-mdb-input-init class="form-outline mb-4">
-                    <label class="form-label fw-bold" for="typeNameX">Name</label>
+                    <label class="form-label fw-bold" for="typeConfirmPasswordX-2">Confirm Password</label>
                     <input
-                      v-model="name"
-                      type="text"
-                      id="typeNameX"
+                      v-model="confirmPassword"
+                      type="password"
+                      id="typeConfirmPasswordX-2"
                       class="form-control form-control-lg"
-                      placeholder="Name"
+                      placeholder="Confirm Password"
                       required
                     />
                   </div>
@@ -122,6 +132,7 @@
       return {
         email: '',
         password: '',
+        confirmPassword: '',
         name: '',
         bio: '',
         birth_date: '',
@@ -130,19 +141,31 @@
     },
     methods: {
       async handleRegister() {
+        if (this.password !== this.confirmPassword) {
+          alert('Passwords do not match');
+          return;
+        }
         try {
           const user = await register(this.email, this.password);
-          await setDoc(doc(db, "users", user.uid), {
-            name: this.name,
-            email: this.email,
-            photo: this.photo,
-            bio: this.bio,
-            birth_date: this.birth_date,
-            state: true
-          });
-          this.$router.push({ name: 'main', params: { id: user.uid } });
+          if (user) {
+            await setDoc(doc(db, "users", user.uid), {
+              name: this.name,
+              email: this.email,
+              photo: this.photo,
+              bio: this.bio,
+              birth_date: this.birth_date,
+              state: true
+            });
+            this.$router.push({ name: 'main', params: { id: user.uid } });
+          } else {
+            console.error('Registration failed: User is undefined');
+          }
         } catch (error) {
-          console.error('Registration error:', error);
+          if (error.code === 'auth/email-already-in-use') {
+            alert('The email address is already in use by another account.');
+          } else {
+            console.error('Registration error:', error);
+          }
         }
       },
       async googleSignIn() {
