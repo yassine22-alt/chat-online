@@ -83,7 +83,8 @@
             photo:null,
             bio:null,
             birth_date:null,
-            state: true
+            state: true,
+            conversations: []
           });
           this.$router.push({ name: 'main', params: { id: user.uid } });
         } catch (error) {
