@@ -2,7 +2,7 @@
     <div class="home">
       <nav class="navbar fixed-top navbar-light bg-light">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">
+          <a class="navbar-brand" href="/">
             <img src="@/assets/MyChatBox_transparent.png" alt="MyChatBox Logo" width="200" class="d-inline-block align-top">
           </a>
           <div class="d-flex ms-auto">
