@@ -6,7 +6,7 @@
       <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
           <div class="col-12 col-md-10 col-lg-8">
-            <div class="card mb-3" style="border-radius: 0.5rem; width: 100%;">
+            <div class="card mb-3" style="border-radius: 0.5rem; width: 100%">
               <div class="row g-0">
                 <div
                   class="col-md-4 gradient-custom text-center text-white d-flex flex-column align-items-center justify-content-center"
@@ -17,10 +17,12 @@
                   "
                 >
                   <img
-                    :src="currentUser.photo || 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'"
+                    :src="
+                      'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'
+                    "
                     alt="Avatar"
                     class="img-fluid my-3"
-                    style="width: 100px; border-radius: 50%;"
+                    style="width: 100px; border-radius: 50%"
                   />
                   <div v-if="currentUser">
                     <h5>{{ currentUser.name }}</h5>
@@ -75,7 +77,7 @@
       </div>
     </section>
 
-    <!-- Modal -->
+    <!-- Edit Profile Modal -->
     <div
       class="modal fade"
       id="editProfile"
@@ -96,23 +98,62 @@
           </div>
           <div class="modal-body">
             <form @submit.prevent="updateProfile">
+              <div class="mb-3 text-center">
+                <img
+                  :src="
+                    currentUser.photo ||
+                    'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'
+                  "
+                  alt="Avatar"
+                  class="img-fluid mb-3"
+                  style="width: 100px; border-radius: 50%"
+                />
+                <div class="d-flex justify-content-center flex-wrap">
+                  <img
+                    v-for="avatar in avatars"
+                    :key="avatar"
+                    :src="avatar"
+                    class="img-fluid avatar-option"
+                    @click="selectAvatar(avatar)"
+                    style="
+                      width: 50px;
+                      cursor: pointer;
+                      margin: 5px;
+                      border-radius: 50%;
+                    "
+                  />
+                </div>
+              </div>
               <div class="mb-3">
                 <label for="editName" class="form-label">Name</label>
-                <input type="text" class="form-control" id="editName" v-model="currentUser.name" />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editName"
+                  v-model="currentUser.name"
+                />
               </div>
               <div class="mb-3">
                 <label for="editBio" class="form-label">Bio</label>
-                <input type="text" class="form-control" id="editBio" v-model="currentUser.bio" />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editBio"
+                  v-model="currentUser.bio"
+                />
               </div>
               <div class="mb-3">
                 <label for="editBirthDate" class="form-label">Birth Date</label>
-                <input type="date" class="form-control" id="editBirthDate" v-model="currentUser.birth_date" />
+                <input
+                  type="date"
+                  class="form-control"
+                  id="editBirthDate"
+                  v-model="currentUser.birth_date"
+                />
               </div>
-              <div class="mb-3">
-                <label for="editPhoto" class="form-label">Photo URL</label>
-                <input type="url" class="form-control" id="editPhoto" v-model="currentUser.photo" />
-              </div>
-              <button type="submit" class="btn btn-primary">Save changes</button>
+              <button type="submit" class="btn btn-secondary">
+                Save changes
+              </button>
             </form>
           </div>
         </div>
@@ -132,13 +173,13 @@ export default {
   },
   data() {
     return {
-      userId: this.$route.params.id,
+      userId: this.$route.params.idUser,
       currentUser: {
-        name: '',
-        bio: '',
-        birth_date: '',
-        photo: '',
-        email: ''
+        name: "",
+        bio: "",
+        birth_date: "",
+        photo: "",
+        email: "",
       },
     };
   },

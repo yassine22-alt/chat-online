@@ -1,9 +1,14 @@
 <template>
     <div>
+      <Navbar />
       <div class="messages">
         <div v-for="message in messages" :key="message.id" class="message">
-          <p><strong>{{ message.senderName }}:</strong> {{ message.content }}</p>
-          <p><small>{{ message.datetime.toDate().toLocaleString() }}</small></p>
+          <p>
+            <strong>{{ message.senderName }}:</strong> {{ message.content }}
+          </p>
+          <p>
+            <small>{{ message.datetime.toDate().toLocaleString() }}</small>
+          </p>
         </div>
       </div>
       <form @submit.prevent="sendMessage">
@@ -15,26 +20,39 @@
   
   <script>
   import { db } from "@/firebase/config.js";
-  import { collection, doc, getDoc, onSnapshot, setDoc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
+  import {
+    collection,
+    doc,
+    getDoc,
+    onSnapshot,
+    setDoc,
+    updateDoc,
+    arrayUnion,
+    serverTimestamp,
+  } from "firebase/firestore";
+  import Navbar from "@/components/NavBar.vue";
   
   export default {
+    components: {
+      Navbar,
+    },
     data() {
       return {
         messages: [],
-        newMessage: '',
+        newMessage: "",
         chatroomId: this.$route.params.idChat,
       };
     },
     created() {
-      const chatroomRef = doc(db, 'chatrooms', this.chatroomId);
+      const chatroomRef = doc(db, "chatrooms", this.chatroomId);
       onSnapshot(chatroomRef, async (snapshot) => {
         const chatroomData = snapshot.data();
         if (chatroomData && chatroomData.message) {
           this.messages = await Promise.all(
             chatroomData.message.map(async (messageId) => {
-              const messageDoc = await getDoc(doc(db, 'message', messageId));
+              const messageDoc = await getDoc(doc(db, "message", messageId));
               const messageData = messageDoc.data();
-              const userDoc = await getDoc(doc(db, 'users', messageData.sender));
+              const userDoc = await getDoc(doc(db, "users", messageData.sender));
               const senderName = userDoc.data().name;
               return { id: messageDoc.id, senderName, ...messageData };
             })
@@ -45,7 +63,7 @@
     methods: {
       async sendMessage() {
         if (this.newMessage.trim()) {
-          const newMessageRef = doc(collection(db, 'message'));
+          const newMessageRef = doc(collection(db, "message"));
           const newMessageData = {
             content: this.newMessage,
             sender: this.$route.params.idUser,
@@ -54,12 +72,12 @@
           };
   
           await setDoc(newMessageRef, newMessageData);
-          const chatroomRef = doc(db, 'chatrooms', this.chatroomId);
+          const chatroomRef = doc(db, "chatrooms", this.chatroomId);
           await updateDoc(chatroomRef, {
             message: arrayUnion(newMessageRef.id),
           });
   
-          this.newMessage = '';
+          this.newMessage = "";
         }
       },
     },
@@ -78,4 +96,3 @@
     margin-bottom: 10px;
   }
   </style>
-  

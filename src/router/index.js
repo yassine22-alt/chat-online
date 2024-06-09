@@ -26,17 +26,17 @@ const routes = [
         component : loginView
     },
     {
-        path: '/main/:id',
+        path: '/main/:idUser',
         name:  'main',
         component :mainPage
     },
     {
-        path: '/newusers/:id',
+        path: '/newusers/:idUser',
         name:  'newUsers',
         component :newUsers
     },
     {
-        path:'/profile/:id' ,
+        path:'/profile/:idUser' ,
         name:  'profile',
         component :profileView
     },
@@ -46,7 +46,7 @@ const routes = [
         component:chatRoomView
     },
     {
-        path: '/newchat/:id',
+        path: '/newchat/:idUser',
         name:  'newchat',
         component : newChatroomView
     }

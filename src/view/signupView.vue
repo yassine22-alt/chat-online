@@ -107,18 +107,6 @@
                       class="form-control form-control-lg"
                     />
                   </div>
-                  <div data-mdb-input-init class="form-outline mb-4">
-                    <label class="form-label fw-bold" for="typePhotoX"
-                      >Photo URL</label
-                    >
-                    <input
-                      v-model="photo"
-                      type="url"
-                      id="typePhotoX"
-                      class="form-control form-control-lg"
-                      placeholder="Photo URL"
-                    />
-                  </div>
                   <button
                     data-mdb-button-init
                     data-mdb-ripple-init
@@ -163,7 +151,6 @@ export default {
       name: '',
       bio: '',
       birth_date: '',
-      photo: ''
     };
   },
   methods: {
@@ -178,12 +165,11 @@ export default {
           await setDoc(doc(db, "users", user.uid), {
             name: this.name,
             email: this.email,
-            photo: this.photo,
             bio: this.bio,
             birth_date: this.birth_date,
             state: true
           });
-          this.$router.push({ name: 'main', params: { id: user.uid } });
+          this.$router.push({ name: 'main', params: { idUser: user.uid } });
         } else {
           console.error('Registration failed: User is undefined');
         }
@@ -204,12 +190,11 @@ export default {
         await setDoc(doc(db, "users", user.uid), {
           name: user.displayName,
           email: user.email,
-          photo: user.photoURL,
           bio: '',
           birth_date: '',
           state: true
         });
-        this.$router.push({ name: 'main', params: { id: user.uid } });
+        this.$router.push({ name: 'main', params: { idUser: user.uid } });
       } catch (error) {
         console.error("Google sign-in error:", error);
       }

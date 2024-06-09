@@ -75,7 +75,7 @@ export default {
       try {
         const user = await login(this.email, this.password);
         console.log("Logged in user:", user);
-        this.$router.push({ name: "main", params: { id: user.uid } });
+        this.$router.push({ name: "main", params: { idUser: user.uid } });
       } catch (error) {
         console.error("Login error:", error);
       }
