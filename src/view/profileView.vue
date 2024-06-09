@@ -174,7 +174,7 @@ export default {
   },
   data() {
     return {
-      userId: this.$route.params.id,
+      userId: this.$route.params.idUser,
       currentUser: {
         name: "",
         bio: "",

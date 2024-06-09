@@ -67,7 +67,7 @@
           querySnapshot.forEach((doc) => {
             let user = doc.data();
             user.id = doc.id;
-            if (user.id !== this.$route.params.id) {
+            if (user.id !== this.$route.params.idUser) {
               this.users.push(user);
             }
           });
@@ -79,7 +79,7 @@
         if (this.chatroomName && this.selectedUsers.length > 1) {
           try {
             // Check for existing chatroom
-            const involvedUsers = [this.$route.params.id, ...this.selectedUsers];
+            const involvedUsers = [this.$route.params.idUser, ...this.selectedUsers];
             const existingChatsQuery = query(
               collection(db, "chatrooms"),
               where("involved_users", "array-contains-any", involvedUsers)
@@ -111,7 +111,7 @@
             };
             const chat = await addDoc(collection(db, "chatrooms"), chatData);
             console.log("Chat created successfully");
-            this.$router.push(`/chat/${this.$route.params.id}/${chat.id}`);
+            this.$router.push(`/chat/${this.$route.params.idUser}/${chat.id}`);
           } catch (error) {
             console.error("Failed to create chat:", error);
           }

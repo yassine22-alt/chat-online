@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       users: [],
-      userId: this.$route.params.id,
+      userId: this.$route.params.idUser,
       userConversations: [],
     };
   },
@@ -111,16 +111,8 @@ export default {
       } catch (error) {
         console.error("Failed to create chat:", error);
       }
-    },
-    goto_newusers() {
-      this.$router.push(`/newusers/${this.userId}`);
-    },
-    goto_profile() {
-      this.$router.push(`/profile/${this.userId}`);
-    },
-    backto_mainpage() {
-      this.$router.push(`/main/${this.userId}`);
     }
+
   },
 
   computed: {

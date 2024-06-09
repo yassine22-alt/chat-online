@@ -68,19 +68,19 @@
 export default {
   methods: {
     goto_newusers() {
-        const userId = this.$route.params.id;
+        const userId = this.$route.params.idUser;
         this.$router.push(`/newusers/${userId}`);
     },
     goto_profile() {
-        const userId = this.$route.params.id;
+        const userId = this.$route.params.idUser; 
         this.$router.push(`/profile/${userId}`);
     },
     backto_mainpage() {
-        const userId = this.$route.params.id;
+        const userId = this.$route.params.idUser; 
         this.$router.push(`/main/${userId}`);
     },
     goto_newgroup() {
-        const userId = this.$route.params.id;
+        const userId = this.$route.params.idUser;
         this.$router.push(`/newchat/${userId}`);
     },
   },

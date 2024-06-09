@@ -169,7 +169,7 @@ export default {
             birth_date: this.birth_date,
             state: true
           });
-          this.$router.push({ name: 'main', params: { id: user.uid } });
+          this.$router.push({ name: 'main', params: { idUser: user.uid } });
         } else {
           console.error('Registration failed: User is undefined');
         }
@@ -194,7 +194,7 @@ export default {
           birth_date: '',
           state: true
         });
-        this.$router.push({ name: 'main', params: { id: user.uid } });
+        this.$router.push({ name: 'main', params: { idUser: user.uid } });
       } catch (error) {
         console.error("Google sign-in error:", error);
       }
