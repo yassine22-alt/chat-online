@@ -101,7 +101,7 @@ export default {
         await updateDoc(doc(db, "users", this.userId), {
           conversations: arrayUnion(chat.id)
         });
-
+        
         await updateDoc(doc(db, "users", otherUserId), {
           conversations: arrayUnion(chat.id)
         });

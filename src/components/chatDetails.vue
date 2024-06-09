@@ -38,8 +38,7 @@
         try {
           const chatDoc = await getDoc(doc(db, "chatrooms", this.chatId));
           const chatData = chatDoc.data();
-            console.log(chatData)
-          if (chatData) {
+          if (chatData.involved_users.length == 2) {
             const otherUserId = chatData.involved_users.find(id => id !== this.userId);
             const userDoc = await getDoc(doc(db, "users", otherUserId));
             const userData = userDoc.data();
@@ -93,9 +92,11 @@
   }
   
   .last-message {
-    flex-grow: 1;
-    text-align: right;
-    margin: 0;
-  }
+  flex-grow: 1;
+  text-align: right;
+  margin: 0;
+  opacity: 0.8; 
+  font-size: 0.9em; 
+}
   </style>
   
