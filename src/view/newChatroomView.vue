@@ -42,8 +42,8 @@
   </template>
   
   <script>
-  import { db } from "@/firebase/config";
-  import { collection, getDocs, addDoc } from "firebase/firestore";
+  import { db } from "@/firebase/config.js";
+  import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
   import Navbar from "@/components/NavBar.vue";
   
   export default {
@@ -78,9 +78,34 @@
       async createChatroom() {
         if (this.chatroomName && this.selectedUsers.length > 1) {
           try {
+            // Check for existing chatroom
+            const involvedUsers = [this.$route.params.id, ...this.selectedUsers];
+            const existingChatsQuery = query(
+              collection(db, "chatrooms"),
+              where("involved_users", "array-contains-any", involvedUsers)
+            );
+            const existingChatsSnapshot = await getDocs(existingChatsQuery);
+  
+            let existingChat = null;
+            existingChatsSnapshot.forEach((doc) => {
+              const chat = doc.data();
+              if (
+                involvedUsers.every((user) => chat.involved_users.includes(user)) &&
+                chat.involved_users.length === involvedUsers.length
+              ) {
+                existingChat = chat;
+              }
+            });
+  
+            if (existingChat) {
+              alert(`Chatroom with the same members already exists: ${existingChat.chat_name}`);
+              return;
+            }
+  
+            // Create new chatroom
             const chatData = {
               chat_name: this.chatroomName,
-              involved_users: [this.$route.params.id, ...this.selectedUsers],
+              involved_users: involvedUsers,
               messages: [],
               typing_status: [],
             };
@@ -91,12 +116,13 @@
             console.error("Failed to create chat:", error);
           }
         } else {
-          alert("Please enter a chatroom name and select at least two user.");
+          alert("Please enter a chatroom name and select at least two users.");
         }
       },
     },
   };
   </script>
+  
   
   <style>
   .container {
