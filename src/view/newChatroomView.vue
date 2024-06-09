@@ -76,7 +76,7 @@
         }
       },
       async createChatroom() {
-        if (this.chatroomName && this.selectedUsers.length > 0) {
+        if (this.chatroomName && this.selectedUsers.length > 1) {
           try {
             const chatData = {
               chat_name: this.chatroomName,
@@ -91,7 +91,7 @@
             console.error("Failed to create chat:", error);
           }
         } else {
-          alert("Please enter a chatroom name and select at least one user.");
+          alert("Please enter a chatroom name and select at least two user.");
         }
       },
     },

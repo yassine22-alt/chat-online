@@ -1,5 +1,6 @@
 <template>
     <div>
+        <Navbar />
       <div class="messages">
         <div v-for="message in messages" :key="message.id" class="message">
           <p><strong>{{ message.senderName }}:</strong> {{ message.content }}</p>
@@ -16,8 +17,12 @@
   <script>
   import { db } from "@/firebase/config.js";
   import { collection, doc, getDoc, onSnapshot, setDoc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
+  import Navbar from "@/components/NavBar.vue";
   
   export default {
+  components: {
+    Navbar,
+  },
     data() {
       return {
         messages: [],
