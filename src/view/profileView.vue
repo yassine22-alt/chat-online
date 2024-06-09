@@ -17,9 +17,7 @@
                   "
                 >
                   <img
-                    :src="
-                      'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'
-                    "
+                    :src="currentUser.photo || 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'"
                     alt="Avatar"
                     class="img-fluid my-3"
                     style="width: 100px; border-radius: 50%"
@@ -100,10 +98,7 @@
             <form @submit.prevent="updateProfile">
               <div class="mb-3 text-center">
                 <img
-                  :src="
-                    currentUser.photo ||
-                    'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'
-                  "
+                  :src="currentUser.photo || 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'"
                   alt="Avatar"
                   class="img-fluid mb-3"
                   style="width: 100px; border-radius: 50%"
@@ -181,6 +176,14 @@ export default {
         photo: "",
         email: "",
       },
+      avatars: [
+        require("@/assets/avatars/avatar1.jpeg"),
+        require("@/assets/avatars/avatar2.jpeg"),
+        require("@/assets/avatars/avatar3.jpeg"),
+        require("@/assets/avatars/avatar4.jpeg"),
+        require("@/assets/avatars/avatar5.jpeg"),
+        require("@/assets/avatars/avatar6.jpeg"),
+      ],
     };
   },
   methods: {
@@ -204,6 +207,9 @@ export default {
         console.error("Error updating profile:", error);
       }
     },
+    selectAvatar(avatar) {
+      this.currentUser.photo = avatar;
+    },
   },
   created() {
     this.fetchUser();
@@ -214,5 +220,8 @@ export default {
 <style>
 .gradient-custom {
   background: linear-gradient(45deg, #6a3939 0%, #000000 100%);
+}
+.avatar-option.selected {
+  border: 2px solid blue;
 }
 </style>
