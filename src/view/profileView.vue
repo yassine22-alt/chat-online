@@ -18,7 +18,6 @@
                 >
                   <img
                     :src="
-                      currentUser.photo ||
                       'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'
                     "
                     alt="Avatar"
