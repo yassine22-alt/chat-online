@@ -39,12 +39,13 @@ export default {
       try {
         const userDoc = await getDoc(doc(db, "users", this.userId));
         if (userDoc.exists()) {
-          this.userConversations = userDoc.data().conversations || [];
+          this.userConversations = userDoc.data().conversations.filter(id => id !== this.userId) || [];
         }
       } catch (error) {
         console.error("Error fetching user conversations:", error);
       }
     },
+
     openChat(chatId) {
       this.$router.push(`/chat/${this.userId}/${chatId}`);
     },

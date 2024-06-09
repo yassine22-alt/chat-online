@@ -46,8 +46,8 @@
   
             this.userName = userData.name; 
             this.userAvatar = userData.avatar;
-            if (chatData.messages.length > 0) {
-              const lastMessageId = chatData.messages[chatData.messages.length - 1];
+            if (chatData.message.length > 0) {
+              const lastMessageId = chatData.message[chatData.message.length - 1];
 
               const lastMessageDoc = await getDoc(doc(db, "message", lastMessageId));
               const lastMessageData = lastMessageDoc.data();
