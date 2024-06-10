@@ -15,11 +15,7 @@
 
 <script>
 import { db } from "@/firebase/config.js";
-<<<<<<< HEAD
-import { doc, onSnapshot, getDoc } from "firebase/firestore";
-=======
 import { doc, onSnapshot } from "firebase/firestore";
->>>>>>> b108a92759511740bb94fbdf413dc057efb0f3a5
 import ChatDetails from "@/components/chatDetails.vue";
 import Navbar from "@/components/NavBar.vue";
 

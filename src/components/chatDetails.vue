@@ -2,7 +2,10 @@
   <div class="chat-details" @click="openChat">
     <div class="user-info">
       <img :src="userAvatar || require('@/assets/avatars/default-avatar.jpeg')" class="avatar" />
-      <p class="user-name">{{ chatName }}</p>
+      <div class="user-name-status">
+        <p class="user-name">{{ chatName }}</p>
+        <span v-if="otherUserOnline" class="online-status"></span>
+      </div>
     </div>
     <p class="last-message">{{ lastMessage }}</p>
   </div>
@@ -28,6 +31,7 @@ export default {
       chatName: "",
       userAvatar: "",
       lastMessage: "",
+      otherUserOnline: false,
     };
   },
   async mounted() {
@@ -42,7 +46,6 @@ export default {
 
         if (chatData) {
           if (chatData.involved_users.length < 3) {
-            // It's a discussion
             const otherUserId = chatData.involved_users.find(
               (id) => id !== this.userId
             );
@@ -51,6 +54,7 @@ export default {
 
             this.chatName = userData.name;
             this.userAvatar = userData.photo || require('@/assets/avatars/default-avatar.jpeg');
+            this.otherUserOnline = userData.state; // Check if the user is online
           } else {
             // It's a chatroom
             this.chatName = chatData.chat_name;
@@ -118,9 +122,22 @@ export default {
   margin-right: 10px;
 }
 
+.user-name-status {
+  display: flex;
+  align-items: center;
+}
+
 .user-name {
   font-weight: bold;
   margin: 0;
+}
+
+.online-status {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: green;
+  margin-left: 5px;
 }
 
 .last-message {

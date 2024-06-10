@@ -62,6 +62,8 @@
 
 <script>
 import { login } from "@/auth/auth.js";
+import { db } from '@/firebase/config.js'
+import { doc, updateDoc } from 'firebase/firestore'
 
 export default {
   data() {
@@ -75,6 +77,10 @@ export default {
       try {
         const user = await login(this.email, this.password);
         console.log("Logged in user:", user);
+        const userDocRef = doc(db, "users", user.uid);
+        await updateDoc(userDocRef, {
+          state: true,
+        });
         this.$router.push({ name: "main", params: { idUser: user.uid } });
       } catch (error) {
         console.error("Login error:", error);
