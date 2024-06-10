@@ -3,7 +3,7 @@
     <Navbar />
 
     <section class="vh-100 main-container ">
-      <div class="container py-5 h-100 d-flex flex-column align-items-center">
+      <div class="container py-5 h-100 d-flex flex-column align-items-center mb-5">
         <h1 class="welcome-text">Welcome {{ currentUser.name }} to your profile!</h1>
         <div class="profile-section d-flex align-items-start mr-5 pr-5">
           <div class="profile-picture-section text-center">

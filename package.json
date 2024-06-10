@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@firebase/messaging": "^0.12.9",
+    "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "core-js": "^3.8.3",
     "firebase": "^10.12.2",
