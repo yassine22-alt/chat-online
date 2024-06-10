@@ -5,6 +5,7 @@
         :src="user.photo || require('@/assets/avatars/default-avatar.jpeg')"
         class="profile-photo"
       />
+      <div v-if="user.state" class="online-indicator"></div>
     </div>
     <div class="card-body text-center">
       <h5 class="card-title user-name">{{ user.name }}</h5>
@@ -41,7 +42,16 @@ export default {
   transition: transform 0.2s;
   cursor: pointer;
 }
-
+.online-indicator {
+  width: 10px;
+  height: 10px;
+  background-color: green;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border: 2px solid white;
+}
 .user-details:hover {
   transform: scale(1.05);
 }

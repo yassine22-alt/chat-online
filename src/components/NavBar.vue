@@ -68,15 +68,16 @@
           />
         </svg>
 
-        <router-link to="/" class="btn btn-outline-dark ms-5"
-          >Logout</router-link
-        >
+        <router-link to="/" class="btn btn-outline-dark ms-5" @click.prevent="handleLogout">Logout</router-link>
       </div>
     </div>
   </nav>
 </template>
 
 <script>
+import { db } from '@/firebase/config.js'
+import { doc, updateDoc } from 'firebase/firestore'
+import { logout } from '@/auth/auth.js'
 export default {
   methods: {
     goto_newusers() {
@@ -95,6 +96,20 @@ export default {
       const userId = this.$route.params.idUser;
       this.$router.push(`/newchat/${userId}`);
     },
+    async handleLogout() {
+      const userId = this.$route.params.idUser;
+      try {
+        await logout();
+        console.log('user logged out')
+        const userDocRef = doc(db, "users", userId);
+        await updateDoc(userDocRef, {
+          state: false,
+        });
+        this.$route.push('/');
+      } catch (error) {
+        console.log('Logout failed')
+      }
+    }
   },
   computed: {
     userId() {

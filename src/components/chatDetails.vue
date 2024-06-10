@@ -2,7 +2,10 @@
   <div class="chat-details" @click="openChat">
     <div class="user-info">
       <img :src="userAvatar || require('@/assets/avatars/default-avatar.jpeg')" class="avatar" />
-      <p class="user-name">{{ chatName }}</p>
+      <div class="user-name-status">
+        <p class="user-name">{{ chatName }}</p>
+        <span v-if="otherUserOnline" class="online-status"></span>
+      </div>
     </div>
     <p class="last-message">{{ lastMessage }}</p>
   </div>
@@ -28,11 +31,15 @@ export default {
       chatName: "",
       userAvatar: "",
       lastMessage: "",
+      otherUserId: "",
+      otherUserOnline: false,
     };
   },
   async mounted() {
-    this.fetchChatData();
-    this.setupChatListener();
+    await this.fetchChatData();
+    if (this.otherUserId) {
+      this.setupUserPresenceListener();
+    }
   },
   methods: {
     async fetchChatData() {
@@ -42,15 +49,15 @@ export default {
 
         if (chatData) {
           if (chatData.involved_users.length < 3) {
-            // It's a discussion
-            const otherUserId = chatData.involved_users.find(
+            this.otherUserId = chatData.involved_users.find(
               (id) => id !== this.userId
             );
-            const userDoc = await getDoc(doc(db, "users", otherUserId));
+            const userDoc = await getDoc(doc(db, "users", this.otherUserId));
             const userData = userDoc.data();
 
             this.chatName = userData.name;
             this.userAvatar = userData.photo || require('@/assets/avatars/default-avatar.jpeg');
+            this.otherUserOnline = userData.state; // Check if the user is online
           } else {
             // It's a chatroom
             this.chatName = chatData.chat_name;
@@ -66,17 +73,13 @@ export default {
         console.error("Error fetching chat data:", error);
       }
     },
-    setupChatListener() {
-      const chatDocRef = doc(db, "chatrooms", this.chatId);
+    setupUserPresenceListener() {
+      const userDocRef = doc(db, "users", this.otherUserId);
 
-      onSnapshot(chatDocRef, (snapshot) => {
+      onSnapshot(userDocRef, (snapshot) => {
         if (snapshot.exists()) {
-          const chatData = snapshot.data();
-
-          if (chatData.message && chatData.message.length > 0) {
-            const lastMessageId = chatData.message[chatData.message.length - 1];
-            this.fetchLastMessage(lastMessageId);
-          }
+          const userData = snapshot.data();
+          this.otherUserOnline = userData.state;
         }
       });
     },
@@ -118,9 +121,22 @@ export default {
   margin-right: 10px;
 }
 
+.user-name-status {
+  display: flex;
+  align-items: center;
+}
+
 .user-name {
   font-weight: bold;
   margin: 0;
+}
+
+.online-status {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: green;
+  margin-left: 5px;
 }
 
 .last-message {
