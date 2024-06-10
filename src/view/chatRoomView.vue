@@ -1,7 +1,7 @@
 <template>
   <div>
     <Navbar />
-    <div class="messages">
+    <div class="messages" ref="messagesContainer">
       <div v-for="message in messages" :key="message.id" class="message">
         <p>
           <strong>{{ message.senderName }}:</strong> {{ message.content }}
@@ -63,6 +63,7 @@ export default {
               return { id: messageDoc.id, senderName, ...messageData };
             })
           );
+          this.scrollToEnd();
         }
 
         if (chatroomData.typing_status) {
@@ -92,6 +93,7 @@ export default {
         });
 
         this.newMessage = "";
+        this.scrollToEnd();
       }
     },
     async updateTypingStatus() {
@@ -108,7 +110,7 @@ export default {
         await updateDoc(chatroomRef, {
           [`typing_status.${this.$route.params.idUser}`]: false,
         });
-      }, 10000); // Set typing status to false after 3 seconds of inactivity
+      }, 3000); // Set typing status to false after 3 seconds of inactivity
     },
     async updateTypingUsers(typingStatus) {
       const typingUserIds = Object.keys(typingStatus).filter(
@@ -124,6 +126,12 @@ export default {
           return null;
         })
       ).then(users => users.filter(user => user !== null));
+    },
+    scrollToEnd() {
+      this.$nextTick(() => {
+        const container = this.$refs.messagesContainer;
+        container.scrollTop = container.scrollHeight;
+      });
     },
   },
 };
