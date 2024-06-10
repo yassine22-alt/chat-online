@@ -1,23 +1,136 @@
 <template>
   <div>
     <Navbar />
-    <div class="messages" ref="messagesContainer">
-      <div v-for="message in messages" :key="message.id" class="message">
-        <p>
-          <strong>{{ message.senderName }}:</strong> {{ message.content }}
-        </p>
-        <p>
-          <small>{{ message.datetime.toDate().toLocaleString() }}</small>
-        </p>
+    <section style="background-color: #eee; margin-top: 70px">
+      <div class="container py-5 mt-5">
+        <div class="row d-flex justify-content-center">
+          <div class="col-md-12 col-lg-10">
+            <div class="card" id="chat2">
+              <div
+                class="card-header d-flex justify-content-between align-items-center p-3"
+              >
+                <div class="d-flex align-items-center">
+                  <img
+                    :src="chatroomAvatar"
+                    alt="Chat Avatar"
+                    class="chat-avatar me-2"
+                  />
+                  <h5 class="mb-0">{{ chatName }}</h5>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-info btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#infoModal"
+                >
+                  Info
+                </button>
+              </div>
+              <div
+                class="card-body"
+                style="position: relative; height: 400px; overflow-y: auto"
+                ref="messagesContainer"
+              >
+                <div
+                  v-for="message in messages"
+                  :key="message.id"
+                  class="d-flex flex-row mb-4"
+                  :class="{
+                    'justify-content-start': message.sender !== currentUserId,
+                    'justify-content-end': message.sender === currentUserId,
+                  }"
+                >
+                  <img
+                    v-if="message.sender !== currentUserId"
+                    :src="message.senderAvatar"
+                    alt="avatar"
+                    class="avatar"
+                  />
+                  <div>
+                    <p
+                      :class="
+                        message.sender !== currentUserId
+                          ? 'message-left'
+                          : 'message-right'
+                      "
+                    >
+                      {{ message.content }}
+                    </p>
+                    <p class="message-time text-muted">
+                      {{ message.datetime.toDate().toLocaleString() }}
+                    </p>
+                  </div>
+                </div>
+                <div class="typing-indicator" v-if="typingUsers.length > 0">
+                  <p v-for="user in typingUsers" :key="user.id">
+                    {{ user.name }} is typing...
+                  </p>
+                </div>
+              </div>
+              <div
+                class="card-footer text-muted d-flex justify-content-start align-items-center p-3"
+              >
+                <img :src="currentUserAvatar" alt="avatar" class="avatar" />
+                <input
+                  type="text"
+                  class="form-control form-control-lg"
+                  v-model="newMessage"
+                  @input="updateTypingStatus"
+                  placeholder="Type message"
+                />
+                <button class="btn btn-dark ms-3" @click="sendMessage">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    class="bi bi-send-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div v-if="typingUsers.length > 0" class="typing-indicator">
-        <p v-for="user in typingUsers" :key="user.id">{{ user.name }} is typing...</p>
+    </section>
+
+    <!-- Info Modal -->
+    <div
+      class="modal fade"
+      id="infoModal"
+      tabindex="-1"
+      aria-labelledby="infoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="infoModalLabel">Chat Info</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">Chat information and details go here.</div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <form @submit.prevent="sendMessage">
-      <input v-model="newMessage" @input="updateTypingStatus" placeholder="Type a message" />
-      <button type="submit">Send</button>
-    </form>
   </div>
 </template>
 
@@ -36,9 +149,7 @@ import {
 import Navbar from "@/components/NavBar.vue";
 
 export default {
-  components: {
-    Navbar,
-  },
+  components: { Navbar },
   data() {
     return {
       messages: [],
@@ -46,9 +157,15 @@ export default {
       chatroomId: this.$route.params.idChat,
       typingUsers: [],
       typingTimeout: null,
+      currentUserId: this.$route.params.idUser,
+      currentUserAvatar: "", // Assuming you have logic to set the current user's avatar
+      chatName: "",
+      chatroomAvatar: "", // Added for chatroom/group avatar
     };
   },
   created() {
+    this.fetchCurrentUser();
+    this.fetchChatName();
     const chatroomRef = doc(db, "chatrooms", this.chatroomId);
     onSnapshot(chatroomRef, async (snapshot) => {
       const chatroomData = snapshot.data();
@@ -58,9 +175,8 @@ export default {
             chatroomData.message.map(async (messageId) => {
               const messageDoc = await getDoc(doc(db, "message", messageId));
               const messageData = messageDoc.data();
-              const userDoc = await getDoc(doc(db, "users", messageData.sender));
-              const senderName = userDoc.data().name;
-              return { id: messageDoc.id, senderName, ...messageData };
+              const senderAvatar = await this.getUserAvatar(messageData.sender);  // Fetch sender's avatar
+              return { id: messageDoc.id, senderAvatar, ...messageData };
             })
           );
           this.scrollToEnd();
@@ -75,12 +191,55 @@ export default {
     });
   },
   methods: {
+    async fetchCurrentUser() {
+      const userDoc = await getDoc(doc(db, "users", this.currentUserId));
+      if (userDoc.exists()) {
+        this.currentUserAvatar =
+          userDoc.data().photo ||
+          require("@/assets/avatars/default-avatar.jpeg");
+      }
+    },
+    async fetchChatName() {
+      const chatroomDoc = await getDoc(doc(db, "chatrooms", this.chatroomId));
+      if (chatroomDoc.exists()) {
+        const chatroomData = chatroomDoc.data();
+        if (chatroomData.involved_users.length > 2) {
+          this.chatName = chatroomData.chat_name;
+          this.chatroomAvatar = chatroomData.photo || require("@/assets/avatars/default-avatar.jpeg"); // Set chatroom/group avatar
+        } else {
+          const otherUserId = chatroomData.involved_users.find(
+            (id) => id !== this.currentUserId
+          );
+          const userDoc = await getDoc(doc(db, "users", otherUserId));
+          if (userDoc.exists()) {
+            this.chatName = userDoc.data().name;
+            this.chatroomAvatar = userDoc.data().photo || require("@/assets/avatars/default-avatar.jpeg"); // Set other user's avatar
+          }
+        }
+      }
+    },
+    async getUserAvatar(userId) {
+      try {
+        const userDoc = await getDoc(doc(db, "users", userId));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          return (
+            userData.photo || require("@/assets/avatars/default-avatar.jpeg")
+          );
+        } else {
+          return require("@/assets/avatars/default-avatar.jpeg");
+        }
+      } catch (error) {
+        console.error("Error fetching user avatar:", error);
+        return require("@/assets/avatars/default-avatar.jpeg");
+      }
+    },
     async sendMessage() {
       if (this.newMessage.trim()) {
         const newMessageRef = doc(collection(db, "message"));
         const newMessageData = {
           content: this.newMessage,
-          sender: this.$route.params.idUser,
+          sender: this.currentUserId,
           datetime: serverTimestamp(),
           id: newMessageRef.id,
         };
@@ -89,7 +248,7 @@ export default {
         await updateDoc(chatroomRef, {
           message: arrayUnion(newMessageRef.id),
           lastMessageTimestamp: serverTimestamp(),
-          [`typing_status.${this.$route.params.idUser}`]: false,
+          [`typing_status.${this.currentUserId}`]: false,
         });
 
         this.newMessage = "";
@@ -103,18 +262,18 @@ export default {
 
       const chatroomRef = doc(db, "chatrooms", this.chatroomId);
       await updateDoc(chatroomRef, {
-        [`typing_status.${this.$route.params.idUser}`]: true,
+        [`typing_status.${this.currentUserId}`]: true,
       });
 
       this.typingTimeout = setTimeout(async () => {
         await updateDoc(chatroomRef, {
-          [`typing_status.${this.$route.params.idUser}`]: false,
+          [`typing_status.${this.currentUserId}`]: false,
         });
       }, 3000); // Set typing status to false after 3 seconds of inactivity
     },
     async updateTypingUsers(typingStatus) {
       const typingUserIds = Object.keys(typingStatus).filter(
-        (userId) => userId !== this.$route.params.idUser && typingStatus[userId]
+        (userId) => userId !== this.currentUserId && typingStatus[userId]
       );
 
       this.typingUsers = await Promise.all(
@@ -125,12 +284,14 @@ export default {
           }
           return null;
         })
-      ).then(users => users.filter(user => user !== null));
+      ).then((users) => users.filter((user) => user !== null));
     },
     scrollToEnd() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer;
-        container.scrollTop = container.scrollHeight;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
       });
     },
   },
@@ -138,18 +299,52 @@ export default {
 </script>
 
 <style scoped>
-.messages {
-  height: 300px;
-  overflow-y: scroll;
-  border: 1px solid #ccc;
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.chat-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+.message-left {
+  background-color: #f5f6f7;
+  border-radius: 10px;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  max-width: 75%;
 }
-.message {
-  margin-bottom: 10px;
+
+.message-right {
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 5px;
+  max-width: 75%;
 }
+
+.message-time {
+  font-size: 0.75rem;
+  text-align: right;
+}
+
 .typing-indicator {
   font-style: italic;
   color: #888;
+  padding: 10px;
+}
+
+.card-footer .form-control {
+  flex-grow: 1;
+}
+
+.card-footer .btn {
+  margin-left: 10px;
 }
 </style>
