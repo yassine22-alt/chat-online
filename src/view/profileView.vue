@@ -19,7 +19,7 @@
                   <img
                     :src="
                       currentUser.photo ||
-                      'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'
+                      require('@/assets/avatars/default-avatar.jpeg')
                     "
                     alt="Avatar"
                     class="img-fluid my-3"
@@ -101,10 +101,7 @@
             <form @submit.prevent="updateProfile">
               <div class="mb-3 text-center">
                 <img
-                  :src="
-                    currentUser.photo ||
-                    'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp'
-                  "
+                   :src="currentUser.photo || require('@/assets/avatars/default-avatar.jpeg')"
                   alt="Avatar"
                   class="img-fluid mb-3"
                   style="width: 100px; border-radius: 50%"

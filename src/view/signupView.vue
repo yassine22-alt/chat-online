@@ -167,7 +167,7 @@ export default {
             email: this.email,
             bio: this.bio,
             birth_date: this.birth_date,
-            state: true
+            state: true,
           });
           this.$router.push({ name: 'main', params: { idUser: user.uid } });
         } else {

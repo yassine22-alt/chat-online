@@ -1,6 +1,6 @@
 <template>
     <div class="user-details mt-1">
-      <img :src=user.photo class="profile-photo"/>
+      <img :src="user.photo || require('@/assets/avatars/default-avatar.jpeg')" class="profile-photo"/>
       <div class="user-name">{{ user.name }}</div>
     </div>
   </template>

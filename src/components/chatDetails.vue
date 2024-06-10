@@ -1,7 +1,7 @@
 <template>
   <div class="chat-details" @click="openChat">
     <div class="user-info">
-      <img :src="userAvatar" class="avatar" />
+      <img :src="require('@/assets/avatars/default-avatar.jpeg')" class="avatar" />
       <p class="user-name">{{ chatName }}</p>
     </div>
     <p class="last-message">{{ lastMessage }}</p>
@@ -41,6 +41,7 @@ export default {
 
         if (chatData) {
           if (chatData.involved_users.length < 3) {
+          
             const otherUserId = chatData.involved_users.find(
               (id) => id !== this.userId
             );
