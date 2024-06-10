@@ -1,14 +1,17 @@
 <template>
   <div>
     <Navbar />
- 
-      <div class="myusers">
-      <UserDetails
-        v-for="user in filteredUsers"
-        :key="user.id"
-        :user="user"
-        @click.native="createChat(user.id)"
-      />
+    <div class="container mt-5 pt-5">
+      <h2 class="text-center-lg mb-4">Start a conversation</h2>
+      <div class="row">
+        <div
+          v-for="user in filteredUsers"
+          :key="user.id"
+          class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4"
+        >
+          <UserDetails :user="user" @click.native="createChat(user.id)" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -18,7 +21,6 @@ import { db } from "@/firebase/config.js";
 import { collection, getDoc, getDocs, addDoc, updateDoc, doc, arrayUnion } from "firebase/firestore";
 import UserDetails from "@/components/userDetails.vue";
 import Navbar from "@/components/NavBar.vue";
-
 
 export default {
   components: {
@@ -32,7 +34,6 @@ export default {
       userConversations: [],
     };
   },
-
   async mounted() {
     await this.fetchUserConversations();
     await this.fetchUsers();
@@ -56,7 +57,6 @@ export default {
           acc.push(convoRef);
           return acc;
         }, []);
-
         const involvedUsersData = await Promise.all(
           involvedUsers.map(async (userRef) => {
             const userSnap = await getDoc(userRef);
@@ -66,7 +66,6 @@ export default {
             return null;
           })
         );
-
         const excludedUserIds = involvedUsersData.reduce((acc, users) => {
           if (users) {
             users.forEach((userId) => {
@@ -77,7 +76,6 @@ export default {
           }
           return acc;
         }, []);
-
         querySnapshot.forEach((doc) => {
           let user = doc.data();
           user.id = doc.id;
@@ -101,32 +99,29 @@ export default {
         await updateDoc(doc(db, "users", this.userId), {
           conversations: arrayUnion(chat.id)
         });
-        
         await updateDoc(doc(db, "users", otherUserId), {
           conversations: arrayUnion(chat.id)
         });
-
         console.log("Chat created successfully");
         this.$router.push(`/chat/${this.userId}/${chat.id}`);
       } catch (error) {
         console.error("Failed to create chat:", error);
       }
     }
-
   },
-
   computed: {
     filteredUsers() {
       return this.users.filter((user) => {
         return user.id !== this.userId && !this.userConversations.includes(user.id);
       });
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style>
-.myusers {
+.container {
   margin-top: 90px;
+  font-family: 'Reddit Mono', monospace;
 }
 </style>
