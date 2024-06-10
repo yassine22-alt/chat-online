@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <div class="main-container">
     <Navbar />
 
     <div class="container mt-5 pt-5">
-      <div class="card">
+      <div class="card shadow-lg">
         <div class="card-body">
+          <h2 class="text-center mb-4">Create a New Chatroom</h2>
           <form @submit.prevent="createChatroom">
             <div class="mb-3">
               <label for="chatroom-name" class="form-label">Chatroom Name</label>
@@ -19,7 +20,7 @@
 
             <div class="mb-3">
               <label class="form-label">Select Users</label>
-              <div v-for="user in users" :key="user.id" class="form-check">
+              <div v-for="user in users" :key="user.id" class="form-check user-checkbox">
                 <input
                   class="form-check-input"
                   type="checkbox"
@@ -27,14 +28,28 @@
                   v-model="selectedUsers"
                   :id="`user-${user.id}`"
                 />
-                <label class="form-check-label" :for="`user-${user.id}`">
+                <label class="form-check-label d-flex align-items-center" :for="`user-${user.id}`">
+                  <img
+                    :src="user.photo || require('@/assets/avatars/default-avatar.jpeg')"
+                    class="img-thumbnail user-thumbnail"
+                  />
                   {{ user.name }}
                 </label>
               </div>
             </div>
 
             <div class="mb-3 text-center">
-              <label class="form-label">Select Chatroom Pic</label>
+              <label class="form-label">Select Chatroom Picture</label>
+              <div v-if="selectedAvatar" class="mt-3">
+                <img
+                  :src="selectedAvatar"
+                  class="img-fluid"
+                  style="
+                    width: 150px;
+                    border-radius: 50%;
+                  "
+                />
+              </div>
               <div class="d-flex justify-content-center flex-wrap">
                 <img
                   v-for="avatar in avatars"
@@ -51,20 +66,10 @@
                   "
                 />
               </div>
-              <div v-if="selectedAvatar" class="mt-3">
-                <h6>Selected Picture:</h6>
-                <img
-                  :src="selectedAvatar"
-                  class="img-fluid"
-                  style="
-                    width: 150px;
-                    border-radius: 50%;
-                  "
-                />
-              </div>
+              
             </div>
 
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary w-100 py-2">
               Create Chatroom
             </button>
           </form>
@@ -203,13 +208,74 @@ export default {
 </script>
 
 <style>
-.container {
-  max-width: 600px;
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
+
+
+
+.main-container {
+  background: linear-gradient(to right, #e0eafc, #cfdef3);
+  min-height: 100vh;
+  font-family: 'Reddit Mono', monospace;
+
 }
-.pt-5 {
-  padding-top: 3rem !important;
+
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: none;
 }
+
+.card-body {
+  padding: 2rem;
+}
+
+.form-label {
+  font-weight: bold;
+  color: #333;
+}
+
+.form-control {
+  font-size: 1rem;
+  border-radius: 0.5rem;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.avatar-option {
+  transition: transform 0.3s ease;
+}
+
+.avatar-option:hover {
+  transform: scale(1.2);
+}
+
 .avatar-option.selected {
-  border: 2px solid blue;
+  border: 3px solid blue;
+}
+
+.user-thumbnail {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.user-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.user-checkbox input {
+  margin-right: 10px;
 }
 </style>
