@@ -31,12 +31,15 @@ export default {
       chatName: "",
       userAvatar: "",
       lastMessage: "",
+      otherUserId: "",
       otherUserOnline: false,
     };
   },
   async mounted() {
-    this.fetchChatData();
-    this.setupChatListener();
+    await this.fetchChatData();
+    if (this.otherUserId) {
+      this.setupUserPresenceListener();
+    }
   },
   methods: {
     async fetchChatData() {
@@ -46,10 +49,10 @@ export default {
 
         if (chatData) {
           if (chatData.involved_users.length < 3) {
-            const otherUserId = chatData.involved_users.find(
+            this.otherUserId = chatData.involved_users.find(
               (id) => id !== this.userId
             );
-            const userDoc = await getDoc(doc(db, "users", otherUserId));
+            const userDoc = await getDoc(doc(db, "users", this.otherUserId));
             const userData = userDoc.data();
 
             this.chatName = userData.name;
@@ -70,17 +73,13 @@ export default {
         console.error("Error fetching chat data:", error);
       }
     },
-    setupChatListener() {
-      const chatDocRef = doc(db, "chatrooms", this.chatId);
+    setupUserPresenceListener() {
+      const userDocRef = doc(db, "users", this.otherUserId);
 
-      onSnapshot(chatDocRef, (snapshot) => {
+      onSnapshot(userDocRef, (snapshot) => {
         if (snapshot.exists()) {
-          const chatData = snapshot.data();
-
-          if (chatData.message && chatData.message.length > 0) {
-            const lastMessageId = chatData.message[chatData.message.length - 1];
-            this.fetchLastMessage(lastMessageId);
-          }
+          const userData = snapshot.data();
+          this.otherUserOnline = userData.state;
         }
       });
     },
