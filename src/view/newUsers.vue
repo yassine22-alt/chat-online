@@ -22,6 +22,7 @@ import { collection, getDoc, getDocs, addDoc, updateDoc, doc, arrayUnion } from 
 import UserDetails from "@/components/userDetails.vue";
 import Navbar from "@/components/NavBar.vue";
 
+
 export default {
   components: {
     UserDetails,
@@ -34,6 +35,7 @@ export default {
       userConversations: [],
     };
   },
+
   async mounted() {
     await this.fetchUserConversations();
     await this.fetchUsers();
@@ -57,6 +59,7 @@ export default {
           acc.push(convoRef);
           return acc;
         }, []);
+
         const involvedUsersData = await Promise.all(
           involvedUsers.map(async (userRef) => {
             const userSnap = await getDoc(userRef);
@@ -66,6 +69,7 @@ export default {
             return null;
           })
         );
+
         const excludedUserIds = involvedUsersData.reduce((acc, users) => {
           if (users) {
             users.forEach((userId) => {
@@ -76,6 +80,7 @@ export default {
           }
           return acc;
         }, []);
+
         querySnapshot.forEach((doc) => {
           let user = doc.data();
           user.id = doc.id;
@@ -99,25 +104,38 @@ export default {
         await updateDoc(doc(db, "users", this.userId), {
           conversations: arrayUnion(chat.id)
         });
+
         await updateDoc(doc(db, "users", otherUserId), {
           conversations: arrayUnion(chat.id)
         });
+
         console.log("Chat created successfully");
         this.$router.push(`/chat/${this.userId}/${chat.id}`);
       } catch (error) {
         console.error("Failed to create chat:", error);
       }
+    },
+    goto_newusers() {
+      this.$router.push(`/newusers/${this.userId}`);
+    },
+    goto_profile() {
+      this.$router.push(`/profile/${this.userId}`);
+    },
+    backto_mainpage() {
+      this.$router.push(`/main/${this.userId}`);
     }
   },
+
   computed: {
     filteredUsers() {
       return this.users.filter((user) => {
         return user.id !== this.userId && !this.userConversations.includes(user.id);
       });
-    }
-  }
+    },
+  },
 };
 </script>
+
 
 <style>
 .container {

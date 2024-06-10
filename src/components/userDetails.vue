@@ -1,5 +1,5 @@
 <template>
-  <div class="card user-details" @click="$emit('click')">
+  <div class="card user-details" @click="$emit('click.stop')" >
     <div class="d-flex justify-content-center align-items-center mb-3">
       <img
         :src="user.photo || require('@/assets/avatars/default-avatar.jpeg')"
