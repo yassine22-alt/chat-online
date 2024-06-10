@@ -2,7 +2,7 @@
   <div>
     <Navbar />
     <div class="container mt-5 pt-5">
-      <h2 class="text-center-lg mb-4">Start a conversation</h2>
+      <h2 class="text-center-lg mb-4 title">Start a conversation</h2>
       <div class="row">
         <div
           v-for="user in filteredUsers"
@@ -123,5 +123,8 @@ export default {
 .container {
   margin-top: 90px;
   font-family: 'Reddit Mono', monospace;
+}
+.title{
+  color: #1d2b64;
 }
 </style>
