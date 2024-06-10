@@ -45,6 +45,7 @@
     },
     created() {
       const chatroomRef = doc(db, "chatrooms", this.chatroomId);
+      console.log(this.chatroomId);
       onSnapshot(chatroomRef, async (snapshot) => {
         const chatroomData = snapshot.data();
         if (chatroomData && chatroomData.message) {
@@ -70,7 +71,7 @@
             datetime: serverTimestamp(),
             id: newMessageRef.id,
           };
-  
+          console.log(this.chatroomId);
           await setDoc(newMessageRef, newMessageData);
           const chatroomRef = doc(db, "chatrooms", this.chatroomId);
           await updateDoc(chatroomRef, {

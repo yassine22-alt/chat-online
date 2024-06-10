@@ -10,7 +10,7 @@
 
 <script>
 import { db } from "@/firebase/config.js";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 export default {
   props: {
@@ -31,7 +31,8 @@ export default {
     };
   },
   async mounted() {
-    await this.fetchChatData();
+    this.fetchChatData();
+    this.setupChatListener();
   },
   methods: {
     async fetchChatData() {
@@ -58,16 +59,34 @@ export default {
 
           if (chatData.message && chatData.message.length > 0) {
             const lastMessageId = chatData.message[chatData.message.length - 1];
-
-            const lastMessageDoc = await getDoc(
-              doc(db, "message", lastMessageId)
-            );
-            const lastMessageData = lastMessageDoc.data();
-            this.lastMessage = lastMessageData.content;
+            this.fetchLastMessage(lastMessageId);
           }
         }
       } catch (error) {
         console.error("Error fetching chat data:", error);
+      }
+    },
+    setupChatListener() {
+      const chatDocRef = doc(db, "chatrooms", this.chatId);
+
+      onSnapshot(chatDocRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const chatData = snapshot.data();
+
+          if (chatData.message && chatData.message.length > 0) {
+            const lastMessageId = chatData.message[chatData.message.length - 1];
+            this.fetchLastMessage(lastMessageId);
+          }
+        }
+      });
+    },
+    async fetchLastMessage(lastMessageId) {
+      try {
+        const lastMessageDoc = await getDoc(doc(db, "message", lastMessageId));
+        const lastMessageData = lastMessageDoc.data();
+        this.lastMessage = lastMessageData.content;
+      } catch (error) {
+        console.error("Error fetching last message:", error);
       }
     },
     openChat() {
