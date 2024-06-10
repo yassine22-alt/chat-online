@@ -1,7 +1,7 @@
 <template>
   <div class="chat-details" @click="openChat">
     <div class="user-info">
-      <img :src="userAvatar" class="avatar" />
+      <img :src="userAvatar || require('@/assets/avatars/default-avatar.jpeg')" class="avatar" />
       <p class="user-name">{{ chatName }}</p>
     </div>
     <p class="last-message">{{ lastMessage }}</p>
@@ -41,6 +41,7 @@ export default {
 
         if (chatData) {
           if (chatData.involved_users.length < 3) {
+            // It's a discussion
             const otherUserId = chatData.involved_users.find(
               (id) => id !== this.userId
             );
@@ -48,12 +49,14 @@ export default {
             const userData = userDoc.data();
 
             this.chatName = userData.name;
+            this.userAvatar = userData.photo || require('@/assets/avatars/default-avatar.jpeg');
+          } else {
+            // It's a chatroom
+            this.chatName = chatData.chat_name;
+            this.userAvatar = chatData.photo || require('@/assets/pdp/default-grp.jpeg');
           }
 
-          else {
-            this.chatName = chatData.chat_name;
-          }
-          if (chatData.message.length > 0) {
+          if (chatData.message && chatData.message.length > 0) {
             const lastMessageId = chatData.message[chatData.message.length - 1];
 
             const lastMessageDoc = await getDoc(
