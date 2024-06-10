@@ -3,9 +3,9 @@
     <Navbar />
     <div class="chats">
       <ChatDetails
-        v-for="chatId in userConversations"
-        :key="chatId"
-        :chatId="chatId"
+        v-for="chat in userConversations"
+        :key="chat.id"
+        :chatId="chat.id"
         :userId="userId"
         @open-chat="openChat"
       />
@@ -15,7 +15,11 @@
 
 <script>
 import { db } from "@/firebase/config.js";
+<<<<<<< HEAD
 import { doc, onSnapshot, getDoc } from "firebase/firestore";
+=======
+import { doc, onSnapshot } from "firebase/firestore";
+>>>>>>> b108a92759511740bb94fbdf413dc057efb0f3a5
 import ChatDetails from "@/components/chatDetails.vue";
 import Navbar from "@/components/NavBar.vue";
 
@@ -37,36 +41,34 @@ export default {
 
       onSnapshot(userDocRef, (snapshot) => {
         if (snapshot.exists()) {
-          this.fetchUserConversations(snapshot.data().conversations);
-        } else {
-          console.error("No such document!");
+          const conversationIds = snapshot.data().conversations || [];
+          this.userConversations = [];
+          conversationIds.forEach(convoId => this.setupConversationListener(convoId));
         }
       });
     },
-    async fetchUserConversations(conversationIds) {
-      try {
-        const conversations = await Promise.all(
-          conversationIds.map(async (convoId) => {
-            const convoDoc = await getDoc(doc(db, "chatrooms", convoId));
-            if (convoDoc.exists()) {
-              const convoData = convoDoc.data();
-              return {
-                id: convoId,
-                lastMessageTimestamp: convoData.lastMessageTimestamp,
-              };
-            }
-            return null;
-          })
-        );
+    setupConversationListener(convoId) {
+      const convoDocRef = doc(db, "chatrooms", convoId);
 
-        const sortedConversations = conversations
-          .filter(convo => convo !== null)
-          .sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+      onSnapshot(convoDocRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const convoData = snapshot.data();
+          const convo = {
+            id: convoId,
+            lastMessageTimestamp: convoData.lastMessageTimestamp || 0,
+          };
 
-        this.userConversations = sortedConversations.map(convo => convo.id);
-      } catch (error) {
-        console.error("Error fetching user conversations:", error);
-      }
+          const index = this.userConversations.findIndex(convo => convo.id === convoId);
+
+          if (index !== -1) {
+            this.userConversations.splice(index, 1, convo);
+          } else {
+            this.userConversations.push(convo);
+          }
+
+          this.userConversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+        }
+      });
     },
     openChat(chatId) {
       this.$router.push(`/chat/${this.userId}/${chatId}`);
