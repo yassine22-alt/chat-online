@@ -15,7 +15,7 @@
 
 <script>
 import { db } from "@/firebase/config.js";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import ChatDetails from "@/components/chatDetails.vue";
 import Navbar from "@/components/NavBar.vue";
 
@@ -35,30 +35,35 @@ export default {
     setupUserConversationsListener() {
       const userDocRef = doc(db, "users", this.userId);
 
-      onSnapshot(userDocRef, async (snapshot) => {
+      onSnapshot(userDocRef, (snapshot) => {
         if (snapshot.exists()) {
-          await this.fetchUserConversations(snapshot.data().conversations);
+          this.fetchUserConversations(snapshot.data().conversations);
+        } else {
+          console.error("No such document!");
         }
       });
     },
     async fetchUserConversations(conversationIds) {
       try {
-        const conversations = [];
+        const conversations = await Promise.all(
+          conversationIds.map(async (convoId) => {
+            const convoDoc = await getDoc(doc(db, "chatrooms", convoId));
+            if (convoDoc.exists()) {
+              const convoData = convoDoc.data();
+              return {
+                id: convoId,
+                lastMessageTimestamp: convoData.lastMessageTimestamp,
+              };
+            }
+            return null;
+          })
+        );
 
-        for (const convoId of conversationIds) {
-          const convoDoc = await getDoc(doc(db, "chatrooms", convoId));
-          if (convoDoc.exists()) {
-            const convoData = convoDoc.data();
-            conversations.push({
-              id: convoId,
-              lastMessageTimestamp: convoData.lastMessageTimestamp,
-            });
-          }
-        }
+        const sortedConversations = conversations
+          .filter(convo => convo !== null)
+          .sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
 
-        conversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
-
-        this.userConversations = conversations.map(convo => convo.id);
+        this.userConversations = sortedConversations.map(convo => convo.id);
       } catch (error) {
         console.error("Error fetching user conversations:", error);
       }
