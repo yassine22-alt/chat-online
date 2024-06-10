@@ -44,7 +44,6 @@
       };
     },
     created() {
-      console.log(this.chatroomId)
       const chatroomRef = doc(db, "chatrooms", this.chatroomId);
       onSnapshot(chatroomRef, async (snapshot) => {
         const chatroomData = snapshot.data();
