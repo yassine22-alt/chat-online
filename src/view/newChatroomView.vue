@@ -7,9 +7,7 @@
         <div class="card-body">
           <form @submit.prevent="createChatroom">
             <div class="mb-3">
-              <label for="chatroom-name" class="form-label"
-                >Chatroom Name</label
-              >
+              <label for="chatroom-name" class="form-label">Chatroom Name</label>
               <input
                 type="text"
                 class="form-control"
@@ -35,6 +33,37 @@
               </div>
             </div>
 
+            <div class="mb-3 text-center">
+              <label class="form-label">Select Chatroom Pic</label>
+              <div class="d-flex justify-content-center flex-wrap">
+                <img
+                  v-for="avatar in avatars"
+                  :key="avatar"
+                  :src="avatar"
+                  class="img-fluid avatar-option"
+                  @click="selectAvatar(avatar)"
+                  :class="{ selected: selectedAvatar === avatar }"
+                  style="
+                    width: 50px;
+                    cursor: pointer;
+                    margin: 5px;
+                    border-radius: 50%;
+                  "
+                />
+              </div>
+              <div v-if="selectedAvatar" class="mt-3">
+                <h6>Selected Picture:</h6>
+                <img
+                  :src="selectedAvatar"
+                  class="img-fluid"
+                  style="
+                    width: 150px;
+                    border-radius: 50%;
+                  "
+                />
+              </div>
+            </div>
+
             <button type="submit" class="btn btn-primary">
               Create Chatroom
             </button>
@@ -55,7 +84,8 @@ import {
   where,
   doc,
   updateDoc,
-  arrayUnion,getDoc,
+  arrayUnion,
+  getDoc,
 } from "firebase/firestore";
 import Navbar from "@/components/NavBar.vue";
 
@@ -68,7 +98,16 @@ export default {
       users: [],
       chatroomName: "",
       selectedUsers: [],
+      selectedAvatar: "",
       currentUser: this.$route.params.idUser,
+      avatars: [
+        require('@/assets/pdp/pdp1.jpeg'),
+        require('@/assets/pdp/pdp2.jpeg'),
+        require('@/assets/pdp/pdp3.jpeg'),
+        require('@/assets/pdp/pdp4.jpeg'),
+        require('@/assets/pdp/pdp5.jpeg'),
+        require('@/assets/pdp/pdp6.jpeg'),
+      ],
     };
   },
   mounted() {
@@ -89,8 +128,11 @@ export default {
         console.error("Error fetching users:", error);
       }
     },
+    selectAvatar(avatar) {
+      this.selectedAvatar = avatar;
+    },
     async createChatroom() {
-      if (this.chatroomName && this.selectedUsers.length > 1) {
+      if (this.chatroomName && this.selectedUsers.length > 1 && this.selectedAvatar) {
         const involvedUsers = [this.currentUser, ...this.selectedUsers];
         const existingChatsQuery = query(
           collection(db, "chatrooms"),
@@ -122,6 +164,7 @@ export default {
             involved_users: involvedUsers,
             messages: [],
             typing_status: [],
+            photo: this.selectedAvatar,
           };
           const chat = await addDoc(collection(db, "chatrooms"), chatData);
 
@@ -152,7 +195,7 @@ export default {
           console.error("Failed to create chat:", error);
         }
       } else {
-        alert("Please enter a chatroom name and select at least two users.");
+        alert("Please enter a chatroom name, select at least two users, and choose a chatroom pic.");
       }
     },
   },
@@ -165,5 +208,8 @@ export default {
 }
 .pt-5 {
   padding-top: 3rem !important;
+}
+.avatar-option.selected {
+  border: 2px solid blue;
 }
 </style>
