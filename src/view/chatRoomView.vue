@@ -75,6 +75,7 @@
           const chatroomRef = doc(db, "chatrooms", this.chatroomId);
           await updateDoc(chatroomRef, {
             message: arrayUnion(newMessageRef.id),
+            lastMessageTimestamp: serverTimestamp()
           });
   
           this.newMessage = "";

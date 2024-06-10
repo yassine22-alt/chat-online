@@ -32,6 +32,7 @@ export default {
   },
   async mounted() {
     this.userId = this.$route.params.idUser;
+    
     await this.fetchUserConversations();
   },
   methods: {
