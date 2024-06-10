@@ -3,9 +3,9 @@
     <Navbar />
     <div class="chats">
       <ChatDetails
-        v-for="chatId in userConversations"
-        :key="chatId"
-        :chatId="chatId"
+        v-for="chat in userConversations"
+        :key="chat.id"
+        :chatId="chat.id"
         :userId="userId"
         @open-chat="openChat"
       />
@@ -15,7 +15,7 @@
 
 <script>
 import { db } from "@/firebase/config.js";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import ChatDetails from "@/components/chatDetails.vue";
 import Navbar from "@/components/NavBar.vue";
 
@@ -37,31 +37,34 @@ export default {
 
       onSnapshot(userDocRef, async (snapshot) => {
         if (snapshot.exists()) {
-          await this.fetchUserConversations(snapshot.data().conversations);
+          const conversationIds = snapshot.data().conversations || [];
+          this.userConversations = [];
+          conversationIds.forEach(convoId => this.setupConversationListener(convoId));
         }
       });
     },
-    async fetchUserConversations(conversationIds) {
-      try {
-        const conversations = [];
+    setupConversationListener(convoId) {
+      const convoDocRef = doc(db, "chatrooms", convoId);
 
-        for (const convoId of conversationIds) {
-          const convoDoc = await getDoc(doc(db, "chatrooms", convoId));
-          if (convoDoc.exists()) {
-            const convoData = convoDoc.data();
-            conversations.push({
-              id: convoId,
-              lastMessageTimestamp: convoData.lastMessageTimestamp,
-            });
+      onSnapshot(convoDocRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const convoData = snapshot.data();
+          const convo = {
+            id: convoId,
+            lastMessageTimestamp: convoData.lastMessageTimestamp || 0,
+          };
+
+          const index = this.userConversations.findIndex(convo => convo.id === convoId);
+
+          if (index !== -1) {
+            this.userConversations.splice(index, 1, convo);
+          } else {
+            this.userConversations.push(convo);
           }
+
+          this.userConversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
         }
-
-        conversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
-
-        this.userConversations = conversations.map(convo => convo.id);
-      } catch (error) {
-        console.error("Error fetching user conversations:", error);
-      }
+      });
     },
     openChat(chatId) {
       this.$router.push(`/chat/${this.userId}/${chatId}`);
