@@ -15,15 +15,12 @@
 
 <script>
 import { db } from "@/firebase/config.js";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import ChatDetails from "@/components/chatDetails.vue";
 import Navbar from "@/components/NavBar.vue";
 
 export default {
-  components: {
-    ChatDetails,
-    Navbar,
-  },
+  components: { ChatDetails, Navbar },
   data() {
     return {
       userId: null,
@@ -32,32 +29,42 @@ export default {
   },
   async mounted() {
     this.userId = this.$route.params.idUser;
-    
-    await this.fetchUserConversations();
+    this.setupUserConversationsListener();
   },
   methods: {
-    async fetchUserConversations() {
-      try {
-        const userDoc = await getDoc(doc(db, "users", this.userId));
-        if (userDoc.exists()) {
-          this.userConversations = userDoc.data().conversations.filter(id => id !== this.userId) || [];
+    setupUserConversationsListener() {
+      const userDocRef = doc(db, "users", this.userId);
+
+      onSnapshot(userDocRef, async (snapshot) => {
+        if (snapshot.exists()) {
+          await this.fetchUserConversations(snapshot.data().conversations);
         }
+      });
+    },
+    async fetchUserConversations(conversationIds) {
+      try {
+        const conversations = [];
+
+        for (const convoId of conversationIds) {
+          const convoDoc = await getDoc(doc(db, "chatrooms", convoId));
+          if (convoDoc.exists()) {
+            const convoData = convoDoc.data();
+            conversations.push({
+              id: convoId,
+              lastMessageTimestamp: convoData.lastMessageTimestamp,
+            });
+          }
+        }
+
+        conversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+
+        this.userConversations = conversations.map(convo => convo.id);
       } catch (error) {
         console.error("Error fetching user conversations:", error);
       }
     },
-
     openChat(chatId) {
       this.$router.push(`/chat/${this.userId}/${chatId}`);
-    },
-    goto_newusers() {
-      this.$router.push(`/newusers/${this.userId}`);
-    },
-    goto_profile() {
-      this.$router.push(`/profile/${this.userId}`);
-    },
-    backto_mainpage() {
-      this.$router.push(`/main/${this.userId}`);
     },
   },
 };
