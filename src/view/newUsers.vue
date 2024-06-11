@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div >
     <Navbar />
-    <div class="container mt-5 pt-5">
+    <div class="container ">
       <h2 class="text-center mb-4 title">Start a conversation</h2>
       <div class="row justify-content-center">
         <div
@@ -139,8 +139,10 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
 
 .container {
-  margin-top: 90px;
+  
   font-family: 'Reddit Mono', monospace;
+  margin-top: 100px;
+  
 }
 
 .title {
@@ -148,4 +150,6 @@ export default {
   text-align: center;
   font-weight: bolder;
 }
+
+
 </style>
