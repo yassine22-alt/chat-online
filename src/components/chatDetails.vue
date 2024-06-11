@@ -37,6 +37,7 @@ export default {
   },
   async mounted() {
     await this.fetchChatData();
+    this.setupChatListener();
     if (this.otherUserId) {
       this.setupUserPresenceListener();
     }
@@ -80,6 +81,19 @@ export default {
         if (snapshot.exists()) {
           const userData = snapshot.data();
           this.otherUserOnline = userData.state;
+        }
+      });
+    },
+    setupChatListener() {
+      const chatDocRef = doc(db, "chatrooms", this.chatId);
+
+      onSnapshot(chatDocRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const chatData = snapshot.data();
+          if (chatData.message && chatData.message.length > 0) {
+            const lastMessageId = chatData.message[chatData.message.length - 1];
+            this.fetchLastMessage(lastMessageId);
+          }
         }
       });
     },
