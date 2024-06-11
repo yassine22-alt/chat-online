@@ -1,5 +1,5 @@
 echo '
-![MyChatBox Logo](@/assets/MyChatBox_transparent.png)
+![MyChatBox Logo](@/assets/MyChatBox_transparent.png)'
 
 # MyChatBox
 
@@ -67,9 +67,6 @@ For detailed explanation on how things work, check out the [Vue CLI Configuratio
 
 If you would like to contribute to this project, please fork the repository and create a pull request with your changes.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
