@@ -291,7 +291,7 @@ export default {
           lastMessageTimestamp: serverTimestamp(),
           [`typing_status.${this.currentUserId}`]: false,
         });
-
+        this.$toast.success('New message received!');
         this.newMessage = "";
         this.scrollToEnd();
       }
