@@ -298,36 +298,7 @@ export default {
     this.fetchCurrentUser();
     this.fetchChatName();
     this.fetchChatMembers();
-    const chatroomRef = doc(db, "chatrooms", this.chatroomId);
-    onSnapshot(chatroomRef, async (snapshot) => {
-      const chatroomData = snapshot.data();
-      if (chatroomData) {
-        if (chatroomData.message) {
-          this.messages = await Promise.all(
-            chatroomData.message.map(async (messageId) => {
-              const messageDoc = await getDoc(doc(db, "message", messageId));
-              const messageData = messageDoc.data();
-              const senderAvatar = await this.getUserAvatar(messageData.sender);
-              const senderName = await this.getUserName(messageData.sender);
-              return {
-                id: messageDoc.id,
-                senderAvatar,
-                senderName,
-                ...messageData,
-              };
-            })
-          );
-          this.scrollToEnd();
-          this.updateMessageReadReceipts();
-        }
-
-        if (chatroomData.typing_status) {
-          this.updateTypingUsers(chatroomData.typing_status);
-        } else {
-          this.typingUsers = [];
-        }
-      }
-    });
+    this.setupChatListeners();
   },
   methods: {
     async fetchCurrentUser() {
@@ -474,6 +445,38 @@ export default {
         return "Delivered";
       }
     },
+    setupChatListeners() {
+      const chatroomRef = doc(db, "chatrooms", this.chatroomId);
+      onSnapshot(chatroomRef, async (snapshot) => {
+        const chatroomData = snapshot.data();
+        if (chatroomData) {
+          if (chatroomData.message) {
+            this.messages = await Promise.all(
+              chatroomData.message.map(async (messageId) => {
+                const messageDoc = await getDoc(doc(db, "message", messageId));
+                const messageData = messageDoc.data();
+                const senderAvatar = await this.getUserAvatar(messageData.sender);
+                const senderName = await this.getUserName(messageData.sender);
+                return {
+                  id: messageDoc.id,
+                  senderAvatar,
+                  senderName,
+                  ...messageData,
+                };
+              })
+            );
+            this.scrollToEnd();
+            this.updateMessageReadReceipts();
+          }
+
+          if (chatroomData.typing_status) {
+            this.updateTypingUsers(chatroomData.typing_status);
+          } else {
+            this.typingUsers = [];
+          }
+        }
+      });
+    },
     async updateTypingStatus() {
       if (this.typingTimeout) {
         clearTimeout(this.typingTimeout);
@@ -521,6 +524,7 @@ export default {
     },
   },
 };
+
 </script>
 
 <style scoped>
