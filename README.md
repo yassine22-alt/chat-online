@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/assets/MyChatBox_transparent.png" alt="MyChatBox Logo" width="200px">
+  <img src="src/assets/MyChatBox_transparent.png" alt="MyChatBox Logo" width="400px">
 </p>
 
 # <p align="center">MyChatBox</p>
@@ -62,10 +62,6 @@ Check out the live version of MyChatBox: [MyChatBox Deployed Link](#)
 ## Customize Configuration
 
 For detailed explanation on how things work, check out the [Vue CLI Configuration Reference](https://cli.vuejs.org/config/).
-
-## Contributing
-
-If you would like to contribute to this project, please fork the repository and create a pull request with your changes.
 
 
 ## Contact
