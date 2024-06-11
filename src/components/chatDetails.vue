@@ -138,8 +138,6 @@ export default {
       await updateDoc(chatDocRef, {
         [`lastRead.${this.userId}`]: serverTimestamp(),
       });
-      this.unreadCount = 0;
-      this.$emit("open-chat", this.chatId);
     },
   },
 };
