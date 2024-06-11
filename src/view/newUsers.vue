@@ -97,7 +97,8 @@ export default {
           chat_name: "Chat",
           involved_users: [this.userId, otherUserId],
           message: [],
-          typing_status: []
+          typing_status: [],
+          lastRead: [this.userId, otherUserId].reduce((acc, userId) => ({ ...acc, [userId]: null }), {}),
         };
         const chat = await addDoc(collection(db, "chatrooms"), chatData);
         await updateDoc(doc(db, "users", this.userId), {

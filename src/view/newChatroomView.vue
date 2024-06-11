@@ -191,6 +191,7 @@ export default {
             messages: [],
             typing_status: [],
             photo: this.selectedAvatar,
+            lastRead: involvedUsers.reduce((acc, userId) => ({ ...acc, [userId]: null }), {}),
           };
           const chat = await addDoc(collection(db, "chatrooms"), chatData);
 
