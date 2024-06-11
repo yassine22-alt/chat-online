@@ -1,46 +1,10 @@
 echo '
-![MyChatBox Logo](path/to/your/logo.png)
+![MyChatBox Logo](@/assets/MyChatBox_transparent.png)
 
 # MyChatBox
 
 Welcome to MyChatBox! A real-time chat application where users can create chatrooms, send messages, and stay connected with their friends and colleagues. Built with Vue.js and Firebase, MyChatBox ensures a seamless chatting experience with real-time updates and notifications.
 
-## Project Setup
-
-To get started with the project, follow these steps:
-
-### Install Dependencies
-
-```bash
-npm install
-
-### Compiles and Hot-reloads for Development
-
-To run the application in development mode:
-
-```bash
-npm run serve
-```
-
-### Compiles and Minifies for Production
-
-To build the project for production:
-
-```bash
-npm run build
-```
-
-### Lints and Fixes Files
-
-To lint and fix files:
-
-```bash
-npm run lint
-```
-
-### Customize Configuration
-
-For more details on customizing the configuration, see [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## Features
 
@@ -67,7 +31,7 @@ Check out the live version of MyChatBox: [MyChatBox Deployed Link](#)
 1. **Clone the repository**:
 
     ```bash
-    git clone https://github.com/yourusername/chat-online.git
+    git clone https://github.com/yassine22-alt/chat-online.git
     cd chat-online
     ```
 
@@ -109,6 +73,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-If you have any questions, please contact us at [support@mychatbox.com](mailto:support@mychatbox.com).
-' > README.md
+If you have any questions, please contact us at [yassine.blali@um6p.ma](mailto:yassine.blali@um6p.ma) or [malak.kably@um6p.ma](mailto:malak.kably@um6p.ma)
+
 ```

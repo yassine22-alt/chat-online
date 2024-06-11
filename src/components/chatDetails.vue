@@ -129,13 +129,16 @@ export default {
         this.unreadCount = messages.length;
       }
     },
-    async openChat() {
+    openChat() {
       const chatDocRef = doc(db, "chatrooms", this.chatId);
-      await updateDoc(chatDocRef, {
+      updateDoc(chatDocRef, {
         [`lastRead.${this.userId}`]: new Date(),
+      }).then(() => {
+        this.unreadCount = 0;
+        this.$emit("open-chat", this.chatId);
+      }).catch(error => {
+        console.error("Error updating lastRead timestamp:", error);
       });
-      this.unreadCount = 0;
-      this.$emit("open-chat", this.chatId);
     },
   },
 };
