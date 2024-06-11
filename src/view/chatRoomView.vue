@@ -38,7 +38,7 @@
                 ref="messagesContainer"
               >
                 <div
-                  v-for="(message, index) in messages"
+                  v-for="message in messages"
                   :key="message.id"
                   class="d-flex flex-row mb-4"
                   :class="{
@@ -71,7 +71,10 @@
                     <p class="message-time text-muted">
                       {{ message.datetime.toDate().toLocaleString() }}
                     </p>
-                    <p v-if="message.sender === currentUserId && index === messages.length - 1" class="message-read-status">
+                    <p
+                      v-if="message.sender === currentUserId"
+                      class="message-read-status"
+                    >
                       {{ getMessageReadStatus(message) }}
                     </p>
                   </div>
@@ -298,44 +301,72 @@ export default {
     };
   },
   created() {
-  this.fetchCurrentUser();
-  this.fetchChatName();
-  this.fetchChatMembers();
+    this.fetchCurrentUser();
+    this.fetchChatName();
+    this.fetchChatMembers();
 
-  const chatroomRef = doc(db, "chatrooms", this.chatroomId);
-  onSnapshot(chatroomRef, async (snapshot) => {
-    const chatroomData = snapshot.data();
-    if (chatroomData) {
-      if (chatroomData.message) {
-        const messages = await Promise.all(
-          chatroomData.message.map(async (messageId) => {
-            const messageDoc = await getDoc(doc(db, "message", messageId));
-            const messageData = messageDoc.data();
-            const senderAvatar = await this.getUserAvatar(messageData.sender);
-            const senderName = await this.getUserName(messageData.sender);
-            return {
-              id: messageDoc.id,
+    const chatroomRef = doc(db, "chatrooms", this.chatroomId);
+    onSnapshot(chatroomRef, async (snapshot) => {
+      const chatroomData = snapshot.data();
+      if (chatroomData) {
+        if (chatroomData.message) {
+          const messages = await Promise.all(
+            chatroomData.message.map(async (messageId) => {
+              const messageDoc = await getDoc(doc(db, "message", messageId));
+              const messageData = messageDoc.data();
+              const senderAvatar = await this.getUserAvatar(messageData.sender);
+              const senderName = await this.getUserName(messageData.sender);
+              return {
+                id: messageDoc.id,
+                senderAvatar,
+                senderName,
+                ...messageData,
+              };
+            })
+          );
+
+          this.messages = messages;
+          this.scrollToEnd();
+          this.updateMessageReadReceipts(); // Ensure this is called to update read receipts
+        }
+
+        if (chatroomData.typing_status) {
+          this.updateTypingUsers(chatroomData.typing_status);
+        } else {
+          this.typingUsers = [];
+        }
+      }
+    });
+
+    // Listen for changes to each message document
+    onSnapshot(collection(db, "message"), async (snapshot) => {
+      snapshot.docChanges().forEach(async (change) => {
+        if (change.type === "modified") {
+          const messageData = change.doc.data();
+          const senderAvatar = await this.getUserAvatar(messageData.sender);
+          const senderName = await this.getUserName(messageData.sender);
+          const messageIndex = this.messages.findIndex(
+            (msg) => msg.id === change.doc.id
+          );
+
+          if (messageIndex !== -1) {
+            this.messages[messageIndex] = {
+              id: change.doc.id,
               senderAvatar,
               senderName,
               ...messageData,
             };
-          })
-        );
+            this.messages = [...this.messages];
+          }
 
-        this.messages = messages;
-        this.scrollToEnd();
-        this.updateMessageReadReceipts(); // Ensure this is called to update read receipts
-      }
-
-      if (chatroomData.typing_status) {
-        this.updateTypingUsers(chatroomData.typing_status);
-      } else {
-        this.typingUsers = [];
-      }
-    }
-  });
-}
-,
+          // If the changed message is the last message, update the read receipts
+          if (messageIndex === this.messages.length - 1) {
+            this.updateMessageReadReceipts();
+          }
+        }
+      });
+    });
+  },
   methods: {
     async fetchCurrentUser() {
       const userDoc = await getDoc(doc(db, "users", this.currentUserId));
@@ -430,29 +461,28 @@ export default {
       }
     },
     async sendMessage() {
-  if (this.newMessage.trim()) {
-    const newMessageRef = doc(collection(db, "message"));
-    const newMessageData = {
-      content: this.newMessage,
-      sender: this.currentUserId,
-      datetime: serverTimestamp(),
-      id: newMessageRef.id,
-      read_receipts: [], // Initialize read_receipts as an empty array
-    };
-    await setDoc(newMessageRef, newMessageData);
-    const chatroomRef = doc(db, "chatrooms", this.chatroomId);
-    await updateDoc(chatroomRef, {
-      message: arrayUnion(newMessageRef.id),
-      lastMessageTimestamp: serverTimestamp(),
-      [`typing_status.${this.currentUserId}`]: false,
-    });
+      if (this.newMessage.trim()) {
+        const newMessageRef = doc(collection(db, "message"));
+        const newMessageData = {
+          content: this.newMessage,
+          sender: this.currentUserId,
+          datetime: serverTimestamp(),
+          id: newMessageRef.id,
+          read_receipts: [], // Initialize read_receipts as an empty array
+        };
+        await setDoc(newMessageRef, newMessageData);
+        const chatroomRef = doc(db, "chatrooms", this.chatroomId);
+        await updateDoc(chatroomRef, {
+          message: arrayUnion(newMessageRef.id),
+          lastMessageTimestamp: serverTimestamp(),
+          [`typing_status.${this.currentUserId}`]: false,
+        });
 
-    this.newMessage = "";
-    this.scrollToEnd();
-    this.updateMessageReadReceipts(); // Call to update read receipts after sending a message
-  }
-}
-,
+        this.newMessage = "";
+        this.scrollToEnd();
+        this.updateMessageReadReceipts(); // Call to update read receipts after sending a message
+      }
+    },
     async updateMessageReadReceipts() {
       try {
         const batch = writeBatch(db);
@@ -525,7 +555,7 @@ export default {
           await updateDoc(userRef, {
             conversations: arrayRemove(this.chatroomId),
           });
-          // eslint-disable-next-line no-undef
+          // eslint-disable-next-line
           const modal = bootstrap.Modal.getInstance(
             document.getElementById("infoModal")
           );
@@ -534,19 +564,17 @@ export default {
         }
       }
     },
-
     getMessageReadStatus(message) {
-  if (!message.read_receipts) {
-    return "";
-  }
-  const totalUsers = this.isGroupChat ? this.chatMembers.length : 2;
-  if (message.read_receipts.length >= totalUsers - 1) {
-    return "Seen";
-  } else {
-    return "";
-  }
-}
-,
+      if (!message.read_receipts) {
+        return "";
+      }
+      const totalUsers = this.isGroupChat ? this.chatMembers.length : 2;
+      if (message.read_receipts.length >= totalUsers - 1) {
+        return "Seen";
+      } else {
+        return "";
+      }
+    },
     scrollToEnd() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer;
