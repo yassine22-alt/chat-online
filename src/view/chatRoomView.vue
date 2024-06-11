@@ -271,9 +271,9 @@ import {
   updateDoc,
   arrayUnion,
   serverTimestamp,
+  writeBatch,
 } from "firebase/firestore";
 import Navbar from "@/components/NavBar.vue";
-import { writeBatch } from "firebase/firestore";
 
 export default {
   components: { Navbar },
