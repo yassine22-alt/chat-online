@@ -129,6 +129,10 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div v-if="isGroupChat">
+             <button type="button" class="btn btn-danger" @click="leaveGroup">Leave Group</button>
+            </div>
+           
           </div>
         </div>
       </div>
@@ -138,7 +142,7 @@
 
 <script>
 import { db } from "@/firebase/config.js";
-import { collection, doc, getDoc, onSnapshot, setDoc, updateDoc, arrayUnion, serverTimestamp } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, arrayRemove, setDoc, updateDoc, arrayUnion, serverTimestamp } from "firebase/firestore";
 import Navbar from "@/components/NavBar.vue";
 
 export default {
@@ -323,6 +327,33 @@ export default {
         })
       ).then((users) => users.filter((user) => user !== null));
     },
+    async leaveGroup() {
+      const conversationRef = doc(db, 'chatrooms', this.chatroomId);
+      const conversationDoc = await getDoc(conversationRef);
+
+      if (conversationDoc.exists()) {
+        const conversationData = conversationDoc.data();
+
+        if (conversationData.involved_users.length > 2) {
+          await updateDoc(conversationRef, {
+            involved_users: arrayRemove(this.currentUserId),
+          });
+
+          const userRef = doc(db, 'users', this.currentUserId);
+          await updateDoc(userRef, {
+            conversations: arrayRemove(this.chatroomId),
+          });
+          // eslint-disable-next-line no-undef
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("infoModal")
+          );
+          modal.hide();
+          this.$router.push(`/main/${this.currentUserId}`);
+        }
+      }
+    },
+
+
     scrollToEnd() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer;
