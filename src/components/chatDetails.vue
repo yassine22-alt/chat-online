@@ -20,7 +20,7 @@
 
 <script>
 import { db } from "@/firebase/config.js";
-import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
 
 export default {
   props: {
@@ -121,10 +121,14 @@ export default {
       const messages = chatData.message || [];
 
       if (lastReadTimestamp) {
-        this.unreadCount = messages.filter(messageId => {
-          const messageDoc = doc(db, "message", messageId);
-          return getDoc(messageDoc).then(doc => doc.exists && doc.data().datetime.toDate() > lastReadTimestamp);
-        }).length;
+        this.unreadCount = messages.reduce((count, messageId) => {
+          return getDoc(doc(db, "message", messageId)).then(doc => {
+            if (doc.exists && doc.data().datetime.toDate() > lastReadTimestamp) {
+              count++;
+            }
+            return count;
+          });
+        }, 0);
       } else {
         this.unreadCount = messages.length;
       }
@@ -132,7 +136,7 @@ export default {
     async openChat() {
       const chatDocRef = doc(db, "chatrooms", this.chatId);
       await updateDoc(chatDocRef, {
-        [`lastRead.${this.userId}`]: new Date(),
+        [`lastRead.${this.userId}`]: serverTimestamp(),
       });
       this.unreadCount = 0;
       this.$emit("open-chat", this.chatId);
@@ -208,4 +212,3 @@ export default {
   margin-left: 10px;
 }
 </style>
-
