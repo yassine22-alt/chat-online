@@ -4,32 +4,23 @@
       <div class="avatar-container">
         <img :src="userAvatar || require('@/assets/avatars/default-avatar.jpeg')" class="avatar" />
         <div class="online-status">
-        <svg
-          v-if="otherUserOnline"
-          xmlns="http://www.w3.org/2000/svg"
-          width="11"
-          height="11"
-          fill="green"
-          class="bi bi-circle-fill"
-          viewBox="0 0 16 16"
-        >
-          <circle cx="8" cy="8" r="8" />
-        </svg>
-
-        
-      </div>
+          <svg v-if="otherUserOnline" xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="green" class="bi bi-circle-fill" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="8" />
+          </svg>
+        </div>
       </div>
       <div class="user-name-status">
         <p class="user-name">{{ chatName }}</p>
       </div>
     </div>
     <p class="last-message">{{ lastMessage }}</p>
+    <span class="unread-count" v-if="unreadCount > 0">{{ unreadCount }}</span>
   </div>
 </template>
 
 <script>
 import { db } from "@/firebase/config.js";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 
 export default {
   props: {
@@ -49,6 +40,7 @@ export default {
       lastMessage: "",
       otherUserId: "",
       otherUserOnline: false,
+      unreadCount: 0,
     };
   },
   async mounted() {
@@ -66,9 +58,7 @@ export default {
 
         if (chatData) {
           if (chatData.involved_users.length < 3) {
-            this.otherUserId = chatData.involved_users.find(
-              (id) => id !== this.userId
-            );
+            this.otherUserId = chatData.involved_users.find(id => id !== this.userId);
             const userDoc = await getDoc(doc(db, "users", this.otherUserId));
             const userData = userDoc.data();
 
@@ -85,6 +75,8 @@ export default {
             const lastMessageId = chatData.message[chatData.message.length - 1];
             this.fetchLastMessage(lastMessageId);
           }
+
+          this.calculateUnreadMessages(chatData);
         }
       } catch (error) {
         console.error("Error fetching chat data:", error);
@@ -110,6 +102,8 @@ export default {
             const lastMessageId = chatData.message[chatData.message.length - 1];
             this.fetchLastMessage(lastMessageId);
           }
+
+          this.calculateUnreadMessages(chatData);
         }
       });
     },
@@ -122,7 +116,25 @@ export default {
         console.error("Error fetching last message:", error);
       }
     },
-    openChat() {
+    calculateUnreadMessages(chatData) {
+      const lastReadTimestamp = chatData.lastRead ? chatData.lastRead[this.userId] : null;
+      const messages = chatData.message || [];
+
+      if (lastReadTimestamp) {
+        this.unreadCount = messages.filter(messageId => {
+          const messageDoc = doc(db, "message", messageId);
+          return getDoc(messageDoc).then(doc => doc.exists && doc.data().datetime.toDate() > lastReadTimestamp);
+        }).length;
+      } else {
+        this.unreadCount = messages.length;
+      }
+    },
+    async openChat() {
+      const chatDocRef = doc(db, "chatrooms", this.chatId);
+      await updateDoc(chatDocRef, {
+        [`lastRead.${this.userId}`]: new Date(),
+      });
+      this.unreadCount = 0;
       this.$emit("open-chat", this.chatId);
     },
   },
@@ -140,7 +152,7 @@ export default {
   cursor: pointer;
   background-color: #e6f0ff;
   transition: background-color 0.3s;
-  margin-bottom: 10px; /* Space between chat details */
+  margin-bottom: 10px;
 }
 
 .chat-details:hover {
@@ -177,7 +189,6 @@ export default {
   position: absolute;
   bottom: 0;
   right: 0;
-
 }
 
 .last-message {
@@ -187,4 +198,14 @@ export default {
   color: #555;
   font-size: 0.875rem;
 }
+
+.unread-count {
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 10px;
+  font-size: 0.875rem;
+  margin-left: 10px;
+}
 </style>
+
