@@ -17,6 +17,32 @@
               />
             </div>
 
+            <div class="mb-3 text-center">
+              <label class="form-label">Chatroom Type</label><p></p>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="chatroomType"
+                  id="publicChatroom"
+                  :value="true"
+                  v-model="chatroomType"
+                />
+                <label class="form-check-label" for="publicChatroom">Public</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="chatroomType"
+                  id="privateChatroom"
+                  :value="false"
+                  v-model="chatroomType"
+                />
+                <label class="form-check-label" for="privateChatroom">Private</label>
+              </div>
+            </div>
+
             <div class="d-flex justify-content-between">
               <div class="users-box p-3">
                 <label class="form-label">Select Users</label>
@@ -98,6 +124,7 @@ export default {
     return {
       users: [],
       chatroomName: "",
+      chatroomType: true,
       selectedUsers: [],
       selectedAvatar: "",
       currentUser: this.$route.params.idUser,
@@ -162,6 +189,7 @@ export default {
         try {
           const chatData = {
             chat_name: this.chatroomName,
+            chat_type: this.chatroomType, // Include chatroom type as boolean
             involved_users: involvedUsers,
             messages: [],
             typing_status: [],
@@ -169,7 +197,6 @@ export default {
           };
           const chat = await addDoc(collection(db, "chatrooms"), chatData);
 
-          // Update conversations for each user
           for (const userId of involvedUsers) {
             const userDocRef = doc(db, "users", userId);
             const userDoc = await getDoc(userDocRef);
@@ -185,7 +212,6 @@ export default {
                 });
               }
             } else {
-              // If user document doesn't exist, you might want to handle this case
               console.error(`User document not found for userId: ${userId}`);
             }
           }
@@ -275,20 +301,34 @@ export default {
   margin-right: 10px;
 }
 
-.users-box, .avatars-box {
-  width: 45%;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  padding: 1rem;
-  margin: 1rem;
-}
-
 .users-box {
-  margin-right: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
 }
 
 .avatars-box {
-  margin-left: 0.5rem;
+  text-align: center;
+}
+
+.avatars-box img {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.avatars-box img:hover {
+  transform: scale(1.1);
+}
+
+.avatars-box img.selected {
+  border: 3px solid #007bff;
+}
+
+.avatars-box .selected-avatar {
+  margin-top: 1rem;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid #007bff;
 }
 </style>

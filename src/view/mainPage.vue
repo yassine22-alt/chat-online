@@ -10,6 +10,7 @@
         @open-chat="openChat"
       />
     </div>
+    <PublicChatrooms :userId="userId" />
   </div>
 </template>
 
@@ -18,9 +19,10 @@ import { db } from "@/firebase/config.js";
 import { doc, onSnapshot } from "firebase/firestore";
 import ChatDetails from "@/components/chatDetails.vue";
 import Navbar from "@/components/NavBar.vue";
+import PublicChatrooms from "@/components/publicChatrooms.vue";
 
 export default {
-  components: { ChatDetails, Navbar },
+  components: { ChatDetails, Navbar, PublicChatrooms },
   data() {
     return {
       userId: null,
@@ -39,7 +41,7 @@ export default {
         if (snapshot.exists()) {
           const conversationIds = snapshot.data().conversations || [];
           this.userConversations = [];
-          conversationIds.forEach(convoId => this.setupConversationListener(convoId));
+          conversationIds.forEach((convoId) => this.setupConversationListener(convoId));
         }
       });
     },
@@ -49,20 +51,25 @@ export default {
       onSnapshot(convoDocRef, (snapshot) => {
         if (snapshot.exists()) {
           const convoData = snapshot.data();
-          const convo = {
-            id: convoId,
-            lastMessageTimestamp: convoData.lastMessageTimestamp || 0,
-          };
+          const isGroupChat = convoData.involved_users.length > 2;
+          const isPublicChat = convoData.type;
 
-          const index = this.userConversations.findIndex(convo => convo.id === convoId);
+          if ((isPublicChat && isGroupChat) || (isGroupChat && convoData.involved_users.includes(this.userId))) {
+            const convo = {
+              id: convoId,
+              lastMessageTimestamp: convoData.lastMessageTimestamp || 0,
+            };
 
-          if (index !== -1) {
-            this.userConversations.splice(index, 1, convo);
-          } else {
-            this.userConversations.push(convo);
+            const index = this.userConversations.findIndex((convo) => convo.id === convoId);
+
+            if (index !== -1) {
+              this.userConversations.splice(index, 1, convo);
+            } else {
+              this.userConversations.push(convo);
+            }
+
+            this.userConversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
           }
-
-          this.userConversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
         }
       });
     },
@@ -78,3 +85,4 @@ export default {
   margin-top: 90px;
 }
 </style>
+
