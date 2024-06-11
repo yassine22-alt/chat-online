@@ -291,7 +291,15 @@ export default {
           lastMessageTimestamp: serverTimestamp(),
           [`typing_status.${this.currentUserId}`]: false,
         });
-        this.$toast.success('New message received!');
+        const notificationsRef = doc(collection(db, "notifications"));
+        const notifData = {
+          message: this.newMessage,
+          sender: this.currentUserId,
+          receiver: this.chatroomId,
+          timestamp: new Date()
+        };
+        await setDoc(notificationsRef, notifData);
+        
         this.newMessage = "";
         this.scrollToEnd();
       }
