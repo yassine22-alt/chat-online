@@ -1,16 +1,24 @@
 <template>
-  <div>
+  <div class="main-container">
     <Navbar />
-    <div class="chats">
-      <ChatDetails
-        v-for="chat in userConversations"
-        :key="chat.id"
-        :chatId="chat.id"
-        :userId="userId"
-        @open-chat="openChat"
-      />
+    <div class="content">
+      <div class="chat-section">
+        <h2>My Conversations</h2>
+        <div class="chats">
+          <ChatDetails
+            v-for="chat in userConversations"
+            :key="chat.id"
+            :chatId="chat.id"
+            :userId="userId"
+            @open-chat="openChat"
+          />
+        </div>
+      </div>
+      <div class="chat-section">
+        <h2>Public Chatrooms</h2>
+        <PublicChatrooms :userId="userId" />
+      </div>
     </div>
-    <PublicChatrooms :userId="userId" />
   </div>
 </template>
 
@@ -88,7 +96,40 @@ export default {
 </script>
 
 <style>
+.main-container {
+  font-family: 'Roboto', sans-serif;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.chat-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 80%;
+  height: 500px; 
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; 
+  margin: 50px;
+}
+.chat-section h2 {
+  font-weight: 700;
+  color: #007bff;
+  margin-bottom: 20px;
+}
+
 .chats {
-  margin-top: 90px;
+  flex-grow: 1;
+  margin-top: 10px;
+}
+
+.chat-details {
+  margin-bottom: 20px; /* Space between chat details */
 }
 </style>
