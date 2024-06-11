@@ -51,24 +51,31 @@ export default {
       onSnapshot(convoDocRef, (snapshot) => {
         if (snapshot.exists()) {
           const convoData = snapshot.data();
-          const isGroupChat = convoData.involved_users.length > 2;
-          const isPublicChat = convoData.type;
+          const convo = {
+            id: convoId,
+            lastMessageTimestamp: convoData.lastMessageTimestamp || 0,
+          };
 
-          if ((isPublicChat && isGroupChat) || (isGroupChat && convoData.involved_users.includes(this.userId))) {
-            const convo = {
-              id: convoId,
-              lastMessageTimestamp: convoData.lastMessageTimestamp || 0,
-            };
+          const index = this.userConversations.findIndex((convo) => convo.id === convoId);
 
-            const index = this.userConversations.findIndex((convo) => convo.id === convoId);
+          if (index !== -1) {
+            this.userConversations.splice(index, 1, convo);
+          } else {
+            this.userConversations.push(convo);
+          }
 
-            if (index !== -1) {
-              this.userConversations.splice(index, 1, convo);
-            } else {
-              this.userConversations.push(convo);
-            }
+          this.userConversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+        } else {
+          // Handle case where the conversation document does not exist
+          const convo = {
+            id: convoId,
+            lastMessageTimestamp: 0,
+          };
+          
+          const index = this.userConversations.findIndex((convo) => convo.id === convoId);
 
-            this.userConversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+          if (index === -1) {
+            this.userConversations.push(convo);
           }
         }
       });
@@ -85,4 +92,3 @@ export default {
   margin-top: 90px;
 }
 </style>
-
