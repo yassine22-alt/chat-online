@@ -1,4 +1,4 @@
-![MyChatBox Logo](assets/MyChatBox_transparent.png)
+![MyChatBox Logo](src/assets/MyChatBox_transparent.png)
 
 # MyChatBox
 
