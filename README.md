@@ -1,9 +1,10 @@
-![MyChatBox Logo](src/assets/MyChatBox_transparent.png)
+<p align="center">
+  <img src="src/assets/MyChatBox_transparent.png" alt="MyChatBox Logo" width="200px">
+</p>
 
-# MyChatBox
+# <p align="center">MyChatBox</p>
 
 Welcome to MyChatBox! A real-time chat application where users can create chatrooms, send messages, and stay connected with their friends and colleagues. Built with Vue.js and Firebase, MyChatBox ensures a seamless chatting experience with real-time updates and notifications.
-
 
 ## Features
 
@@ -70,5 +71,3 @@ If you would like to contribute to this project, please fork the repository and 
 ## Contact
 
 If you have any questions, please contact us at [yassine.blali@um6p.ma](mailto:yassine.blali@um6p.ma) or [malak.kably@um6p.ma](mailto:malak.kably@um6p.ma)
-
-```
