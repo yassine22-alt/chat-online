@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/assets/MyChatBox_transparent.png" alt="MyChatBox Logo" width="400px">
+  <img src="src/assets/MyChatBox_transparent.png" alt="MyChatBox Logo" width="300px">
 </p>
 
 # <p align="center">MyChatBox</p>
