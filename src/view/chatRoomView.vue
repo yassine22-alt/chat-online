@@ -78,7 +78,7 @@
             </div>
             <div v-if="isGroupChat">
               <h5 class="fw-bold">Members</h5>
-              <div v-for="member in chatMembers" :key="member.id" class="member-info mb-3">
+              <div v-for="member in chatMembers" :key="member.id" class="member-info mb-3" :class="{'current-user': member.id === currentUserId}">
                 <div class="d-flex align-items-center mb-2">
                   <img :src="member.photo" alt="avatar" class="avatar me-3" />
                   <div>
@@ -101,13 +101,15 @@
                     <p class="mb-0 ms-2">Offline</p>
                   </div>
                 </div>
-                <p class="fw-bold mb-0">Bio:</p>
-                <p>{{ member.bio }}</p>
+                <div class="bio-section">
+                  <p class="fw-bold mb-0">Bio:</p>
+                  <p class="bio-text">{{ member.bio }}</p>
+                </div>
               </div>
             </div>
             <div v-else>
               <h5 class="fw-bold">Bio:</h5>
-              <p>{{ chatBio }}</p>
+              <p class="bio-text">{{ chatBio }}</p>
               <div class="d-flex align-items-center mb-2">
                 <p class="fw-bold mb-0">Status:</p>
                 <div v-if="chatOnline" class="d-flex align-items-center ms-2">
@@ -304,7 +306,7 @@ export default {
         await updateDoc(chatroomRef, {
           [`typing_status.${this.currentUserId}`]: false,
         });
-      }, 3000); // Set typing status to false after 3 seconds of inactivity
+      }, 2000); 
     },
     async updateTypingUsers(typingStatus) {
       const typingUserIds = Object.keys(typingStatus).filter(
@@ -417,4 +419,15 @@ export default {
   background-color: #fff;
 }
 
+.bio-section {
+  text-align: start;
+}
+
+.bio-text {
+  margin-left: 0;
+}
+
+.current-user {
+  border: 2px solid #007bff;
+}
 </style>
