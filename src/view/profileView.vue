@@ -2,8 +2,8 @@
   <div>
     <Navbar />
 
-    <section class="vh-100 main-container ">
-      <div class="container py-5 h-100 d-flex flex-column align-items-center mb-5">
+    <section class="vh-100 main-container py-5 h-100 d-flex flex-column align-items-center mb-5">
+      
         <h1 class="welcome-text">Welcome {{ currentUser.name }} to your profile!</h1>
         <div class="profile-section d-flex align-items-start mr-5 pr-5">
           <div class="profile-picture-section text-center">
@@ -32,8 +32,8 @@
               />
             </svg>
           </div>
-          <div class="profile-container card p-4">
-            <div class="card-body p-4">
+          <div class="profile-container card-body p-4">
+            
               <div class="info-box">
                 <h6>Name:</h6>
                 <p>{{ currentUser.name }}</p>
@@ -60,10 +60,10 @@
                   <p>Press edit to enter your birthdate</p>
                 </div>
               </div>
-            </div>
+            
           </div>
         </div>
-      </div>
+      
     </section>
 
     <!-- Edit Profile Modal -->
@@ -228,6 +228,7 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
+  margin-top: 60px;
 }
 
 .welcome-text {
@@ -238,14 +239,14 @@ body {
 
 .profile-section {
   display: flex;
-  width: 80%;
+  width: 50%;
   background-color:#1d2b64;
   padding: 20px;
   border-radius: 50px;
 }
 
 .profile-picture-section {
-  width: 33%;
+  width: 40%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -263,11 +264,10 @@ body {
 }
 
 .profile-container {
-  width: 67%;
+  width: 90%;
   background: white;
   border-radius: 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  padding: 2rem;
   margin-left: 20px;
 }
 

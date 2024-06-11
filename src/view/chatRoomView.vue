@@ -4,8 +4,8 @@
     <section style="background-color: #eee; margin-top: 70px">
       <div class="container py-5 mt-5">
         <div class="row d-flex justify-content-center">
-          <div class="col-md-12 col-lg-10">
-            <div class="card" id="chat2">
+          
+            <div class="card col-md-12 col-lg-10" id="chat2">
               <div
                 class="card-header d-flex justify-content-between align-items-center p-3"
               >
@@ -117,7 +117,7 @@
                 </button>
               </div>
             </div>
-          </div>
+          
         </div>
       </div>
     </section>

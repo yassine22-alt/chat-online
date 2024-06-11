@@ -1,9 +1,14 @@
 <template>
-  <div>
+  <div class="home">
     <nav class="navbar fixed-top navbar-light bg-light">
       <div class="container-fluid">
         <a class="navbar-brand" href="/">
-          <img src="@/assets/MyChatBox_transparent.png" alt="MyChatBox Logo" width="200" class="d-inline-block align-top">
+          <img
+            src="@/assets/MyChatBox_transparent.png"
+            alt="MyChatBox Logo"
+            width="200"
+            class="d-inline-block align-top"
+          />
         </a>
         <div class="d-flex ms-auto">
           <router-link to="/signup" class="btn btn-outline-dark me-2">Sign Up</router-link>
@@ -12,51 +17,42 @@
       </div>
     </nav>
 
-    <section class="whole vh-100" style="background-color: #808080">
-      <div class="container py-5 ">
-        <div class=" d-flex justify-content-center align-items-center ">
-          <div class="col-12 col-md-8 col-lg-6 col-xl-5 align-items-center">
-            <div class="card shadow-2-strong p-3" style="border-radius: 1rem; width: 100%;">
-              <div class="card-body p-5 text-center">
-                
-                <h3 class="mb-5 fw-bold">Login</h3>
-                <div data-mdb-input-init class="form-outline mb-4">
-                  <label class="form-label fw-bold" for="typeEmailX-2">Email</label>
-                  <input
-                    v-model="email"
-                    type="email"
-                    id="typeEmailX-2"
-                    class="form-control form-control-lg"
-                    placeholder="Email"
-                    required
-                  />
-                </div>
-                <div data-mdb-input-init class="form-outline mb-4">
-                  <label class="form-label fw-bold" for="typePasswordX-2">Password</label>
-                  <input
-                    v-model="password"
-                    type="password"
-                    id="typePasswordX-2"
-                    class="form-control form-control-lg"
-                    placeholder="Password"
-                    required
-                  />
-                </div>
-                <button
-                  @click="handleLogin"
-                  data-mdb-button-init
-                  data-mdb-ripple-init
-                  class="btn btn-secondary btn-lg btn-block fw-bold"
-                  type="submit"
-                >
-                  Login
-                </button>
+    <div class="welcome-message">
+      <h1>Login to MyChatBox</h1>
+      <div class="form-container">
+        <div class="card shadow-2-strong p-3 text-center" style="border-radius: 1rem; width: 90%;">
+          
+            <form @submit.prevent="handleLogin">
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label fw-bold" for="typeEmailX-2">Email</label>
+                <input
+                  v-model="email"
+                  type="email"
+                  id="typeEmailX-2"
+                  class="form-control form-control-lg"
+                  placeholder="Email"
+                  required
+                />
               </div>
-            </div>
-          </div>
+              <div data-mdb-input-init class="form-outline mb-4">
+                <label class="form-label fw-bold" for="typePasswordX-2">Password</label>
+                <input
+                  v-model="password"
+                  type="password"
+                  id="typePasswordX-2"
+                  class="form-control form-control-lg"
+                  placeholder="Password"
+                  required
+                />
+              </div>
+              <button data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block fw-bold" type="submit">
+                Login
+              </button>
+            </form>
+          
         </div>
       </div>
-    </section>
+    </div>
   </div>
 </template>
 
@@ -84,6 +80,7 @@ export default {
         this.$router.push({ name: "main", params: { idUser: user.uid } });
       } catch (error) {
         console.error("Login error:", error);
+        alert("The email address doesnt exist.");
       }
     },
   },
@@ -93,7 +90,57 @@ export default {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
 
-.whole {
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+.home {
   font-family: "Reddit Mono", monospace;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #ffffff, #d0e7ff);
+  padding-bottom: 50px;
+}
+
+.welcome-message {
+  text-align: center;
+  padding-top: 50px;
+  z-index: 5;
+  position: relative;
+}
+
+.welcome-message h1 {
+  font-size: 50px;
+  margin-bottom: 20px;
+  color: black;
+  font-weight: bold;
+}
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  padding: 0 15px; /* Add padding on the sides */
+}
+
+.card {
+  width: 80%; 
+  max-width: 600px; 
+}
+
+.cursor {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 </style>

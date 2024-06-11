@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar fixed-top navbar-light bg-light">
+  <nav class="navbar fixed-top navbar-light bg-white">
     <div class="container-fluid">
       <a class="navbar-brand" @click="backto_mainpage">
         <img

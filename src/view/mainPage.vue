@@ -12,6 +12,12 @@
             :userId="userId"
             @open-chat="openChat"
           />
+          <div v-if="userConversations.length === 0" class="no-conversations" @click="goToNewUsers">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+            </svg>
+          </div>
         </div>
       </div>
       <div class="chat-section">
@@ -74,7 +80,6 @@ export default {
 
           this.userConversations.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
         } else {
-          // Handle case where the conversation document does not exist
           const convo = {
             id: convoId,
             lastMessageTimestamp: 0,
@@ -91,6 +96,9 @@ export default {
     openChat(chatId) {
       this.$router.push(`/chat/${this.userId}/${chatId}`);
     },
+    goToNewUsers() {
+      this.$router.push(`/newUsers/${this.userId}`);
+    }
   },
 };
 </script>
@@ -104,6 +112,8 @@ export default {
   display: flex;
   justify-content: space-between;
   padding: 20px;
+  margin-top: 50px;
+  width: 80%;
 }
 
 .chat-section {
@@ -111,13 +121,13 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  width: 80%;
+  width: 45%;
   height: 500px; 
   display: flex;
   flex-direction: column;
   overflow-y: auto; 
-  margin: 50px;
 }
+
 .chat-section h2 {
   font-weight: 700;
   color: #007bff;
@@ -129,7 +139,15 @@ export default {
   margin-top: 10px;
 }
 
+.no-conversations {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  cursor: pointer;
+}
+
 .chat-details {
-  margin-bottom: 20px; /* Space between chat details */
+  margin-bottom: 20px; 
 }
 </style>

@@ -1,101 +1,98 @@
 <template>
   <div class="main-container">
     <Navbar />
-    <div class="container mt-2 mb-2 pt-5 d-flex justify-content-center">
-      <div class="card shadow-lg w-1000">
-        <div class="card-body">
-          <h2 class="text-center mb-4">Create a New Chatroom</h2>
-          <form @submit.prevent="createChatroom">
-            <div class="mb-3 text-center">
-              <label for="chatroom-name" class="form-label">Chatroom Name</label>
+    <div class="container mt-5 mb-2 pt-5 d-flex justify-content-center">
+      <div class="card-body  chatroom-card">
+        <h2 class="text-center-lg mb-4">Create a New Chatroom</h2>
+        <form @submit.prevent="createChatroom">
+          <div class="mb-3 text-center">
+            <label for="chatroom-name" class="form-label">Chatroom Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="chatroom-name"
+              v-model="chatroomName"
+              required
+            />
+          </div>
+
+          <div class="mb-3 text-center">
+            <label class="form-label">Chatroom Type</label><p></p>
+            <div class="form-check form-check-inline">
               <input
-                type="text"
-                class="form-control"
-                id="chatroom-name"
-                v-model="chatroomName"
-                required
+                class="form-check-input"
+                type="radio"
+                name="chatroomType"
+                id="publicChatroom"
+                :value="true"
+                v-model="chatroomType"
               />
+              <label class="form-check-label" for="publicChatroom">Public</label>
             </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="chatroomType"
+                id="privateChatroom"
+                :value="false"
+                v-model="chatroomType"
+              />
+              <label class="form-check-label" for="privateChatroom">Private</label>
+            </div>
+          </div>
 
-            <div class="mb-3 text-center">
-              <label class="form-label">Chatroom Type</label><p></p>
-              <div class="form-check form-check-inline">
+          <div class="d-flex justify-content-between flex-wrap">
+            <div class="users-box p-3 flex-fill">
+              <label class="form-label">Select Users</label>
+              <div v-for="user in users" :key="user.id" class="form-check user-checkbox">
                 <input
                   class="form-check-input"
-                  type="radio"
-                  name="chatroomType"
-                  id="publicChatroom"
-                  :value="true"
-                  v-model="chatroomType"
+                  type="checkbox"
+                  :value="user.id"
+                  v-model="selectedUsers"
+                  :id="`user-${user.id}`"
                 />
-                <label class="form-check-label" for="publicChatroom">Public</label>
+                <label class="form-check-label d-flex align-items-center" :for="`user-${user.id}`">
+                  <img
+                    :src="user.photo || require('@/assets/avatars/default-avatar.jpeg')"
+                    class="img-thumbnail user-thumbnail"
+                  />
+                  {{ user.name }}
+                </label>
               </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="chatroomType"
-                  id="privateChatroom"
-                  :value="false"
-                  v-model="chatroomType"
+            </div>
+
+            <div class="avatars-box p-3 flex-fill">
+              <label class="form-label">Select Chatroom Picture</label>
+              <div class="d-flex justify-content-center flex-wrap mt-3">
+                <img
+                  v-for="avatar in avatars"
+                  :key="avatar"
+                  :src="avatar"
+                  class="img-fluid avatar-option"
+                  @click="selectAvatar(avatar)"
+                  :class="{ selected: selectedAvatar === avatar }"
+                  style="width: 50px; cursor: pointer; margin: 5px; border-radius: 50%;"
                 />
-                <label class="form-check-label" for="privateChatroom">Private</label>
+              </div>
+              <div class="text-center mt-3">
+                <img
+                  v-if="selectedAvatar"
+                  :src="selectedAvatar"
+                  class="img-fluid"
+                  style="width: 150px; border-radius: 50%;"
+                />
               </div>
             </div>
+          </div>
 
-            <div class="d-flex justify-content-between">
-              <div class="users-box p-3">
-                <label class="form-label">Select Users</label>
-                <div v-for="user in users" :key="user.id" class="form-check user-checkbox">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    :value="user.id"
-                    v-model="selectedUsers"
-                    :id="`user-${user.id}`"
-                  />
-                  <label class="form-check-label d-flex align-items-center" :for="`user-${user.id}`">
-                    <img
-                      :src="user.photo || require('@/assets/avatars/default-avatar.jpeg')"
-                      class="img-thumbnail user-thumbnail"
-                    />
-                    {{ user.name }}
-                  </label>
-                </div>
-              </div>
-
-              <div class="avatars-box p-3">
-                <label class="form-label">Select Chatroom Picture</label>
-                
-                <div class="d-flex justify-content-center flex-wrap mt-3">
-                  <img
-                    v-for="avatar in avatars"
-                    :key="avatar"
-                    :src="avatar"
-                    class="img-fluid avatar-option"
-                    @click="selectAvatar(avatar)"
-                    :class="{ selected: selectedAvatar === avatar }"
-                    style="width: 50px; cursor: pointer; margin: 5px; border-radius: 50%;"
-                  />
-                </div>
-                <div class="text-center mt-3">
-                  <img
-                    v-if="selectedAvatar"
-                    :src="selectedAvatar"
-                    class="img-fluid"
-                    style="width: 150px; border-radius: 50%;"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div class="text-center mt-4">
-              <button type="submit" class="btn btn-primary w-50 py-2">
-                Create Chatroom
-              </button>
-            </div>
-          </form>
-        </div>
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary w-50 py-2">
+              Create Chatroom
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -233,22 +230,21 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
 
 .main-container {
-  background: linear-gradient(to right, #e0eafc, #cfdef3);
+  background: white;
   min-height: 100vh;
   font-family: 'Reddit Mono', monospace;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-.card {
-  border-radius: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border: none;
+.container{
+  width: 900px;
+  padding: 50px;
+  
 }
-
 .card-body {
-  padding: 2rem;
+  
+  width: 60%;
 }
 
 .form-label {
@@ -330,5 +326,10 @@ export default {
   height: 150px;
   border-radius: 50%;
   border: 2px solid #007bff;
+}
+
+.text-center-lg{
+  color: black;
+  font-weight: bolder;
 }
 </style>

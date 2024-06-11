@@ -2,12 +2,12 @@
   <div>
     <Navbar />
     <div class="container mt-5 pt-5">
-      <h2 class="text-center-lg mb-4 title">Start a conversation</h2>
-      <div class="row">
+      <h2 class="text-center mb-4 title">Start a conversation</h2>
+      <div class="row justify-content-center">
         <div
           v-for="user in filteredUsers"
           :key="user.id"
-          class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4"
+          class="col-12 col-sm-6 col-md-4 mb-4"
         >
           <UserDetails :user="user" @click.native="createChat(user.id)" />
         </div>
@@ -21,7 +21,6 @@ import { db } from "@/firebase/config.js";
 import { collection, getDoc, getDocs, addDoc, updateDoc, doc, arrayUnion } from "firebase/firestore";
 import UserDetails from "@/components/userDetails.vue";
 import Navbar from "@/components/NavBar.vue";
-
 
 export default {
   components: {
@@ -136,13 +135,17 @@ export default {
 };
 </script>
 
-
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
+
 .container {
   margin-top: 90px;
   font-family: 'Reddit Mono', monospace;
 }
-.title{
+
+.title {
   color: #1d2b64;
+  text-align: center;
+  font-weight: bolder;
 }
 </style>
