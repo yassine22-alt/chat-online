@@ -1,10 +1,36 @@
 <template>
   <div class="chat-details" @click="openChat">
     <div class="user-info">
-      <img :src="userAvatar || require('@/assets/avatars/default-avatar.jpeg')" class="avatar" />
+      <div class="avatar-container">
+        <img :src="userAvatar || require('@/assets/avatars/default-avatar.jpeg')" class="avatar" />
+        <div class="online-status">
+        <svg
+          v-if="otherUserOnline"
+          xmlns="http://www.w3.org/2000/svg"
+          width="11"
+          height="11"
+          fill="green"
+          class="bi bi-circle-fill"
+          viewBox="0 0 16 16"
+        >
+          <circle cx="8" cy="8" r="8" />
+        </svg>
+
+        <svg
+          v-else
+          xmlns="http://www.w3.org/2000/svg"
+          width="11"
+          height="11"
+          fill="red"
+          class="bi bi-circle-fill"
+          viewBox="0 0 16 16"
+        >
+          <circle cx="8" cy="8" r="8" />
+        </svg>
+      </div>
+      </div>
       <div class="user-name-status">
         <p class="user-name">{{ chatName }}</p>
-        <span v-if="otherUserOnline" class="online-status"></span>
       </div>
     </div>
     <p class="last-message">{{ lastMessage }}</p>
@@ -136,6 +162,10 @@ export default {
   align-items: center;
 }
 
+.avatar-container {
+  position: relative;
+}
+
 .avatar {
   width: 50px;
   height: 50px;
@@ -154,11 +184,10 @@ export default {
 }
 
 .online-status {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: green;
-  margin-left: 5px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
 }
 
 .last-message {
