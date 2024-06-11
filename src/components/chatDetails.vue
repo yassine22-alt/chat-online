@@ -58,9 +58,8 @@ export default {
 
             this.chatName = userData.name;
             this.userAvatar = userData.photo || require('@/assets/avatars/default-avatar.jpeg');
-            this.otherUserOnline = userData.state; // Check if the user is online
+            this.otherUserOnline = userData.state;
           } else {
-            // It's a chatroom
             this.chatName = chatData.chat_name;
             this.userAvatar = chatData.photo || require('@/assets/pdp/default-grp.jpeg');
           }
@@ -119,8 +118,15 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 10px;
-  border-bottom: 1px solid #ccc;
+  border: 1px solid #007bff;
+  border-radius: 8px;
   cursor: pointer;
+  background-color: #e6f0ff;
+  transition: background-color 0.3s;
+}
+
+.chat-details:hover {
+  background-color: #d0e4ff;
 }
 
 .user-info {
@@ -141,7 +147,7 @@ export default {
 }
 
 .user-name {
-  font-weight: bold;
+  font-weight: 500;
   margin: 0;
 }
 
@@ -157,5 +163,7 @@ export default {
   flex-grow: 1;
   text-align: right;
   margin: 0;
+  color: #555;
+  font-size: 0.875rem;
 }
 </style>
