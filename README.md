@@ -1,5 +1,4 @@
-echo '
-![MyChatBox Logo](@/assets/MyChatBox_transparent.png)'
+![MyChatBox Logo](assets/MyChatBox_transparent.png)
 
 # MyChatBox
 
