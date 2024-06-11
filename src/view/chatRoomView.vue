@@ -71,7 +71,60 @@
             <h5 class="modal-title" id="infoModalLabel">Chat Info</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">Chat information and details go here.</div>
+          <div class="modal-body">
+            <div class="text-center">
+              <img :src="chatroomAvatar" alt="Chat Avatar" class="chat-avatar-large mb-3" />
+              <h3 class="mb-3">{{ chatName }}</h3>
+            </div>
+            <div v-if="isGroupChat">
+              <h5 class="fw-bold">Members</h5>
+              <div v-for="member in chatMembers" :key="member.id" class="member-info mb-3">
+                <div class="d-flex align-items-center mb-2">
+                  <img :src="member.photo" alt="avatar" class="avatar me-3" />
+                  <div>
+                    <p class="mb-0">{{ member.name }}</p>
+                    <p class="text-muted mb-0">{{ member.email }}</p>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                  <p class="fw-bold mb-0">Status:</p>
+                  <div v-if="member.online" class="d-flex align-items-center ms-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="green" class="bi bi-toggle-on" viewBox="0 0 16 16">
+                      <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
+                    </svg>
+                    <p class="mb-0 ms-2">Online</p>
+                  </div>
+                  <div v-else class="d-flex align-items-center ms-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-toggle-off" viewBox="0 0 16 16">
+                      <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
+                    </svg>
+                    <p class="mb-0 ms-2">Offline</p>
+                  </div>
+                </div>
+                <p class="fw-bold mb-0">Bio:</p>
+                <p>{{ member.bio }}</p>
+              </div>
+            </div>
+            <div v-else>
+              <h5 class="fw-bold">Bio:</h5>
+              <p>{{ chatBio }}</p>
+              <div class="d-flex align-items-center mb-2">
+                <p class="fw-bold mb-0">Status:</p>
+                <div v-if="chatOnline" class="d-flex align-items-center ms-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="green" class="bi bi-toggle-on" viewBox="0 0 16 16">
+                    <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8"/>
+                  </svg>
+                  <p class="mb-0 ms-2">Online</p>
+                </div>
+                <div v-else class="d-flex align-items-center ms-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-toggle-off" viewBox="0 0 16 16">
+                    <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5"/>
+                  </svg>
+                  <p class="mb-0 ms-2">Offline</p>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
@@ -99,12 +152,16 @@ export default {
       currentUserAvatar: "", 
       chatName: "",
       chatroomAvatar: "", 
-      isGroupChat: false, 
+      chatBio: "",
+      chatOnline: false,
+      isGroupChat: false,
+      chatMembers: [], 
     };
   },
   created() {
     this.fetchCurrentUser();
     this.fetchChatName();
+    this.fetchChatMembers();
     const chatroomRef = doc(db, "chatrooms", this.chatroomId);
     onSnapshot(chatroomRef, async (snapshot) => {
       const chatroomData = snapshot.data();
@@ -114,8 +171,8 @@ export default {
             chatroomData.message.map(async (messageId) => {
               const messageDoc = await getDoc(doc(db, "message", messageId));
               const messageData = messageDoc.data();
-              const senderAvatar = await this.getUserAvatar(messageData.sender); // Fetch sender's avatar
-              const senderName = await this.getUserName(messageData.sender); // Fetch sender's name
+              const senderAvatar = await this.getUserAvatar(messageData.sender); 
+              const senderName = await this.getUserName(messageData.sender); 
               return { id: messageDoc.id, senderAvatar, senderName, ...messageData };
             })
           );
@@ -144,15 +201,43 @@ export default {
         const chatroomData = chatroomDoc.data();
         if (chatroomData.involved_users.length > 2) {
           this.chatName = chatroomData.chat_name;
-          this.chatroomAvatar = chatroomData.photo || require("@/assets/avatars/default-avatar.jpeg"); // Set chatroom/group avatar
+          this.chatroomAvatar = chatroomData.photo || require("@/assets/avatars/default-avatar.jpeg"); 
           this.isGroupChat = true;
         } else {
           const otherUserId = chatroomData.involved_users.find((id) => id !== this.currentUserId);
           const userDoc = await getDoc(doc(db, "users", otherUserId));
           if (userDoc.exists()) {
             this.chatName = userDoc.data().name;
-            this.chatroomAvatar = userDoc.data().photo || require("@/assets/avatars/default-avatar.jpeg"); // Set other user's avatar
+            this.chatroomAvatar = userDoc.data().photo || require("@/assets/avatars/default-avatar.jpeg"); 
+            this.chatBio = userDoc.data().bio || "";
+            this.chatOnline = userDoc.data().state || false;
           }
+        }
+      }
+    },
+    async fetchChatMembers() {
+      const chatroomDoc = await getDoc(doc(db, "chatrooms", this.chatroomId));
+      if (chatroomDoc.exists()) {
+        const chatroomData = chatroomDoc.data();
+        if (chatroomData.involved_users.length > 2) {
+          this.isGroupChat = true;
+          this.chatMembers = await Promise.all(
+            chatroomData.involved_users.map(async (userId) => {
+              const userDoc = await getDoc(doc(db, "users", userId));
+              if (userDoc.exists()) {
+                const userData = userDoc.data();
+                return {
+                  id: userId,
+                  name: userData.name,
+                  photo: userData.photo || require("@/assets/avatars/default-avatar.jpeg"),
+                  email: userData.email,
+                  bio: userData.bio,
+                  online: userData.state,
+                };
+              }
+              return null;
+            })
+          ).then((users) => users.filter((user) => user !== null));
         }
       }
     },
@@ -262,6 +347,13 @@ export default {
   border-radius: 50%;
 }
 
+.chat-avatar-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
 .info-icon {
   cursor: pointer;
   margin-right: 10px;
@@ -313,4 +405,16 @@ export default {
 .card-footer .btn {
   margin-left: 10px;
 }
+
+.fw-bold {
+  font-weight: bold;
+}
+
+.member-info {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #fff;
+}
+
 </style>
