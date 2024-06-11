@@ -14,7 +14,6 @@
       </div>
     </div>
     <p class="last-message">{{ lastMessage }}</p>
-    <span class="unread-count" v-if="unreadCount > 0">{{ unreadCount }}</span>
   </div>
 </template>
 
