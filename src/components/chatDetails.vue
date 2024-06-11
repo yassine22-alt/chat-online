@@ -57,8 +57,9 @@ export default {
 
             this.chatName = userData.name;
             this.userAvatar = userData.photo || require('@/assets/avatars/default-avatar.jpeg');
-            this.otherUserOnline = userData.state;
+            this.otherUserOnline = userData.state; // Check if the user is online
           } else {
+            // It's a chatroom
             this.chatName = chatData.chat_name;
             this.userAvatar = chatData.photo || require('@/assets/pdp/default-grp.jpeg');
           }
@@ -109,6 +110,7 @@ export default {
   cursor: pointer;
   background-color: #e6f0ff;
   transition: background-color 0.3s;
+  margin-bottom: 10px; /* Space between chat details */
 }
 
 .chat-details:hover {
