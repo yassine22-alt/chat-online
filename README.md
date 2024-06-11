@@ -14,26 +14,6 @@ To get started with the project, follow these steps:
 ```bash
 npm install
 
-Certainly! Here is the full README content formatted in a Bash code block:
-
-```bash
-echo '
-![MyChatBox Logo](path/to/your/logo.png)
-
-# MyChatBox
-
-Welcome to MyChatBox! A real-time chat application where users can create chatrooms, send messages, and stay connected with their friends and colleagues. Built with Vue.js and Firebase, MyChatBox ensures a seamless chatting experience with real-time updates and notifications.
-
-## Project Setup
-
-To get started with the project, follow these steps:
-
-### Install Dependencies
-
-```bash
-npm install
-```
-
 ### Compiles and Hot-reloads for Development
 
 To run the application in development mode:
